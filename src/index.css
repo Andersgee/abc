@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+table {
+  table-layout: fixed;
+  width: 90%;
+}
+
+td {
+  height: 22px;
+  text-align: center;
+  border-bottom: 1pt dotted black;
+  border-right: 1pt dotted black;
+}
