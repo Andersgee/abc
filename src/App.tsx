@@ -5,8 +5,8 @@ import { cn } from "./lib/cn";
 //const PERIOD_LENGThS = [20, 20, 16, 16, 16, 16, 16, 7, 7, 7, 7, 7]
 
 const { header, body } = makeRows(
-  64,
-  [20, 20, 16, 16, 16, 16, 16, 7, 7, 7, 7, 7]
+  16 * 4 + 1,
+  [20, 20, 16, 16, 16, 15, 15, 7, 7, 7, 7, 7]
 );
 
 function dateformat(date: Date) {
@@ -41,12 +41,13 @@ export default function App() {
                     return (
                       <td
                         className={cn(
-                          x === 3 && "text-red-700",
-                          x === 2 && "text-orange-700",
-                          x === 1 && "text-green-700"
+                          "font-bold",
+                          x === 3 && "bg-red-500 text-red-950",
+                          x === 2 && "bg-orange-400 text-orange-800",
+                          x === 1 && "bg-green-300 text-green-700"
                         )}
                       >
-                        {x}
+                        {letterFromNumber(x)}
                       </td>
                     );
                   } else {
@@ -60,4 +61,13 @@ export default function App() {
       </div>
     </div>
   );
+}
+function letterFromNumber(x: number) {
+  if (x === 3) {
+    return "C";
+  } else if (x === 2) {
+    return "B";
+  } else {
+    return "A";
+  }
 }
