@@ -2,11 +2,11 @@ import { format, addDays } from "date-fns";
 import { makeRows } from "./lib/abc";
 import { cn } from "./lib/cn";
 
-//const PERIOD_LENGThS = [20, 20, 16, 16, 16, 16, 16, 7, 7, 7, 7, 7]
+//const PERIOD_LENGThS = [16, 16, 16, 16, 16, 20, 20, 7, 7, 7, 7, 7]
 
 const { header, body } = makeRows(
-  16 * 4 + 1,
-  [20, 20, 16, 16, 16, 15, 15, 7, 7, 7, 7, 7]
+  61,
+  [16, 16, 16, 13, 13, 20, 20, 7, 7, 7, 7, 7]
 );
 
 function dateformat(date: Date) {
