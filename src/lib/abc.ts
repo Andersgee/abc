@@ -5,7 +5,7 @@ const ABC_SCHEDULE: Array<{
 }> = [
   {
     offset: 0,
-    bodypart: "CHEST",
+    bodypart: "UPBACK",
     schedule: [1, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0],
   },
   {
@@ -15,18 +15,18 @@ const ABC_SCHEDULE: Array<{
   },
   {
     offset: 0,
-    bodypart: "TRICEPS",
+    bodypart: "BICEPS",
     schedule: [1, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0],
   },
   {
     offset: 0,
-    bodypart: "UPBACK",
+    bodypart: "CHEST",
     schedule: [1, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0],
   },
 
   {
     offset: 0,
-    bodypart: "BICEPS",
+    bodypart: "TRICEPS",
     schedule: [1, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0],
   },
 
