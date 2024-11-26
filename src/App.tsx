@@ -2,7 +2,7 @@ import { format, addDays } from "date-fns";
 import { makeRows } from "./lib/abc";
 import { cn } from "./utils/cn";
 import { useEffect, useRef, useState } from "react";
-import { openIndexedDB, setup } from "./lib/idb";
+import { getItem, openIndexedDB, setItem, setup } from "./lib/idb";
 
 //const PERIOD_LENGThS = [16, 16, 16, 16, 16, 20, 20, 7, 7, 7, 7, 7]
 
@@ -34,6 +34,38 @@ export default function App() {
   return (
     <div className="flex justify-center">
       <div>
+        <div className="flex gap-4">
+          <button
+            className="bg-red-300"
+            onClick={() => {
+              getItem("Bill")
+                .then((r) => console.log(r))
+                .catch((err) => console.log(err));
+            }}
+          >
+            get Bill
+          </button>
+          <button
+            className="bg-red-300"
+            onClick={() => {
+              getItem("apa")
+                .then((r) => console.log(r))
+                .catch((err) => console.log(err));
+            }}
+          >
+            get apa
+          </button>
+          <button
+            className="bg-red-300"
+            onClick={() => {
+              setItem({ name: "Bill", other: "yep" })
+                .then((r) => console.log(r))
+                .catch((err) => console.log(err));
+            }}
+          >
+            update Bill
+          </button>
+        </div>
         <h1 className="text-center">ABC schedule</h1>
         <div className="py-4"></div>
         <table>

@@ -1,4 +1,7 @@
 //https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
+
+let db: IDBDatabase | undefined;
+
 export async function openIndexedDB(
   name = "MyTestDatabase",
   version = 3
@@ -42,9 +45,54 @@ const stuff = [
   { name: "Bill", age: 359, email: "bill@company.com" },
   { name: "Donna", age: 32, email: "donna@home.org" },
 ];
+type X = {
+  name: string;
+} & Record<string, unknown>;
+
+export async function getItem(key: string) {
+  const storeName = "bodypart";
+  return new Promise((resolve, reject) => {
+    if (db) {
+      const store = db
+        .transaction("bodypart", "readwrite")
+        .objectStore(storeName);
+
+      const req = store.get(key);
+      req.onsuccess = (event) => {
+        resolve(event.target.result);
+      };
+      req.onerror = (event) => {
+        reject(event.target.error?.message);
+      };
+    } else {
+      reject();
+    }
+  });
+}
+
+export async function setItem(obj: X) {
+  const storeName = "bodypart";
+  return new Promise((resolve, reject) => {
+    if (db) {
+      const store = db
+        .transaction("bodypart", "readwrite")
+        .objectStore(storeName);
+
+      const req = store.put(obj);
+      req.onsuccess = (event) => {
+        resolve(event.target.result);
+      };
+      req.onerror = (event) => {
+        reject(event.target.error?.message);
+      };
+    } else {
+      reject();
+    }
+  });
+}
 
 export async function setup() {
-  const db = await openIndexedDB();
+  db = await openIndexedDB();
 
   db.onerror = (event) => {
     // Generic error handler for all errors targeted at this database's
@@ -66,6 +114,7 @@ export async function setup() {
   };
   */
 
+  /*
   const bodypartStore = transaction.objectStore("bodypart");
 
   for (const x of stuff) {
@@ -88,4 +137,5 @@ export async function setup() {
       console.log("get onerror, result:", event.target.result);
     };
   }
+  */
 }
