@@ -7,11 +7,11 @@ import { useState } from "react";
 
 export default function App() {
   const [offsets, setOffsets] = useState([
-    16, 16, 16, 16, 16, 20, 20, 7, 7, 7, 7, 7,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   ]);
-  const { header, body } = makeRows(61, offsets);
+  const { header, body, ABC_SCHEDULE } = makeRows(61, offsets);
 
-  const date = new Date();
+  const date = new Date("2024-11-24");
   const datestr = (i: number) => dateformat(addDays(date, i));
 
   return (
@@ -32,7 +32,13 @@ export default function App() {
           </thead>
           <tbody>
             <tr>
-              <td></td>
+              <td>period len</td>
+              {ABC_SCHEDULE.map((b) => (
+                <td>{b.schedule.length}</td>
+              ))}
+            </tr>
+            <tr>
+              <td>offset</td>
               {header.map((_x, i) => (
                 <td key={i}>
                   <div className="flex flex-col">
@@ -47,12 +53,14 @@ export default function App() {
                     >
                       ↑
                     </button>
+                    <div>{offsets[i]}</div>
                     <button
                       onClick={() => {
                         setOffsets((prev) => {
                           const k = prev.slice();
 
-                          k[i] = Math.max(0, k[i] - 1);
+                          //k[i] = Math.max(0, k[i] - 1);
+                          k[i] = k[i] - 1;
                           return k;
                         });
                       }}
@@ -65,19 +73,25 @@ export default function App() {
             </tr>
             {body.map((row, i) => (
               <tr key={i}>
-                <td>{datestr(i)}</td>
+                <td>
+                  {
+                    datestr(i)
+                    //i
+                  }
+                </td>
                 {row.map((x) => {
-                  if (x) {
+                  if (typeof x === "string" && x.length > 0) {
+                    const c = x.charAt(0);
                     return (
                       <td
                         className={cn(
                           "font-bold",
-                          x === 3 && "bg-red-500 text-red-950",
-                          x === 2 && "bg-orange-400 text-orange-800",
-                          x === 1 && "bg-green-300 text-green-700"
+                          c === "C" && "bg-red-500 text-red-950",
+                          c === "B" && "bg-orange-400 text-orange-800",
+                          c === "A" && "bg-green-300 text-green-700"
                         )}
                       >
-                        {letterFromNumber(x)}
+                        {x}
                       </td>
                     );
                   } else {
