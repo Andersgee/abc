@@ -90,6 +90,10 @@ export async function setItem(obj: X) {
     }
   });
 }
+export const idb = {
+  getItem,
+  setItem,
+};
 
 export async function setup() {
   db = await openIndexedDB();

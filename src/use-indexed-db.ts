@@ -1,7 +1,8 @@
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
+import { idb } from "./lib/idb";
 //import { asyncStorage, type AsyncStorageKey } from "#/utils/async-storage";
 
-type Key = "a" | "b";
+type Key = "Bill" | "Donna";
 
 /*
 tanstack query is general for any external async data
@@ -31,28 +32,35 @@ const queryClient = new QueryClient({
   },
 });
 
-export function useAsyncStorageQuery(key: Key) {
+export function useIndexedDbQuery(key: Key) {
   return useQuery(
     {
       queryKey: [key],
-      queryFn: () => asyncStorage.getItem(key),
+      queryFn: () => idb.getItem(key),
     },
     queryClient
   );
 }
 
-export function useAsyncStorageMutation(key: Key) {
+type X = {
+  name: string;
+} & Record<string, unknown>;
+
+export function useIndexedDbMutation(key: Key) {
   return useMutation(
     {
-      mutationFn: (input: string | null) => {
+      mutationFn: (input: Omit<X, "name">) => {
+        return idb.setItem({ name: key, ...input });
+        /*
         if (input === null) {
           return asyncStorage.removeItem(key);
         } else {
           return asyncStorage.setItem(key, input);
         }
+        */
       },
       onSuccess: (_data, variables, _context) => {
-        queryClient.setQueryData([key], variables);
+        queryClient.setQueryData([key], { name: key, ...variables });
       },
     },
     queryClient

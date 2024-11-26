@@ -3,11 +3,13 @@ import { makeRows } from "./lib/abc";
 import { cn } from "./utils/cn";
 import { useEffect, useRef, useState } from "react";
 import { getItem, openIndexedDB, setItem, setup } from "./lib/idb";
+import { Table } from "./table";
 
 //const PERIOD_LENGThS = [16, 16, 16, 16, 16, 20, 20, 7, 7, 7, 7, 7]
 
 export default function App() {
   const didRun = useRef(false);
+  const [isReady, setIsReady] = useState(false);
   useEffect(() => {
     /*
     openIndexedDB()
@@ -19,7 +21,7 @@ export default function App() {
       });
 */
     if (!didRun.current) {
-      void setup();
+      void setup().then(() => setIsReady(true));
       didRun.current = true;
     }
   }, []);
@@ -31,6 +33,9 @@ export default function App() {
   const date = new Date("2024-11-24");
   const datestr = (i: number) => dateformat(addDays(date, i));
 
+  if (!isReady) return null;
+
+  return <Table />;
   return (
     <div className="flex justify-center">
       <div>
