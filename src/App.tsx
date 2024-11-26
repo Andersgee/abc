@@ -1,11 +1,28 @@
 import { format, addDays } from "date-fns";
 import { makeRows } from "./lib/abc";
-import { cn } from "./lib/cn";
-import { useState } from "react";
+import { cn } from "./utils/cn";
+import { useEffect, useRef, useState } from "react";
+import { openIndexedDB, setup } from "./lib/idb";
 
 //const PERIOD_LENGThS = [16, 16, 16, 16, 16, 20, 20, 7, 7, 7, 7, 7]
 
 export default function App() {
+  const didRun = useRef(false);
+  useEffect(() => {
+    /*
+    openIndexedDB()
+      .then((db) => {
+        console.log(db);
+      })
+      .catch((err) => {
+        console.log("catch, err:", err);
+      });
+*/
+    if (!didRun.current) {
+      void setup();
+      didRun.current = true;
+    }
+  }, []);
   const [offsets, setOffsets] = useState([
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   ]);
