@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { api } from "./api";
-import { customLink } from "./custom-link";
-import { idbLink } from "./router-link";
+import { debugLink } from "./debug-link";
+import { routerCallerLink } from "./router-caller-link";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,7 +25,7 @@ const queryClient = new QueryClient({
 });
 
 const trpcClient = api.createClient({
-  links: [customLink, idbLink()],
+  links: [debugLink, routerCallerLink()],
 });
 
 export function TrpcProvider({ children }: { children: React.ReactNode }) {

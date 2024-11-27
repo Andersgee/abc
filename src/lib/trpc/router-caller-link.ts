@@ -7,20 +7,22 @@ import { createCallerFactory } from "./trpc";
 const createCaller = createCallerFactory(idbRouter);
 const caller = createCaller({});
 
-export function idbLink(): TRPCLink<IdbRouter> {
+export function routerCallerLink(): TRPCLink<IdbRouter> {
   return () => {
     return ({ op }) => {
       return observable((observer) => {
-        const { path, input, type } = op;
+        const { path, input } = op;
 
+        // @ts-expect-error this works
         caller[path](input)
-          .then((res) => {
+          .then((res: unknown) => {
             observer.next({
               result: { data: res },
             });
             observer.complete();
           })
-          .catch((cause) => {
+          .catch((cause: unknown) => {
+            // @ts-expect-error meh
             observer.error(TRPCClientError.from(cause));
           });
 

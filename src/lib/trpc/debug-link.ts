@@ -2,7 +2,7 @@ import type { TRPCLink } from "@trpc/client";
 import { type IdbRouter } from "./router";
 import { observable } from "@trpc/server/observable";
 
-export const customLink: TRPCLink<IdbRouter> = () => {
+export const debugLink: TRPCLink<IdbRouter> = () => {
   // here we just got initialized in the app - this happens once per app
   // useful for storing cache for instance
   return ({ next, op }) => {
