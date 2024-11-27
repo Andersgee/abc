@@ -10,8 +10,13 @@ export function Table2({ className }: Props) {
   //const { data, isLoading } = trpc.greeting.useQuery({ hello: "mek" });
   const { data, isLoading } = trpc.greeting.useQuery();
   const { mutate, isPending } = trpc.nested.mut.useMutation({
+    onMutate(variables) {
+      return { some: "special context" };
+    },
     onSuccess(data, variables, context) {
-      console.log("onSuccess", data, variables, context);
+      console.log("onSuccess, data:", data);
+      console.log("onSuccess,variables:", variables);
+      console.log("onSuccess, context", context);
     },
   });
 
