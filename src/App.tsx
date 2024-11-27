@@ -2,10 +2,10 @@ import { format, addDays } from "date-fns";
 import { makeRows } from "./lib/abc";
 import { cn } from "./utils/cn";
 import { useEffect, useRef, useState } from "react";
-import { getItem, openIndexedDB, setItem, setup } from "./lib/idb";
-import { Table } from "./table";
-import { TrpcProvider } from "./lib/trpc/trpc-provider";
+import { getItem, setItem, setup } from "./lib/idb";
+
 import { Table2 } from "./table2";
+import { TrpcProvider } from "./lib/trpc/client/provider";
 
 //const PERIOD_LENGThS = [16, 16, 16, 16, 16, 20, 20, 7, 7, 7, 7, 7]
 

@@ -1,8 +1,9 @@
 import { observable } from "@trpc/server/observable";
 import { sleep } from "../../utils/sleep";
 
-import { TRPCClientError, TRPCLink } from "@trpc/client";
-import type { AppRouter } from "./router";
+import { TRPCClientError } from "@trpc/client";
+import type { OperationResultEnvelope, type TRPCLink } from "@trpc/client";
+import { routerCaller, type AppRouter } from "./server/router";
 
 export function idbLink(): TRPCLink<AppRouter> {
   return () => {
@@ -10,75 +11,27 @@ export function idbLink(): TRPCLink<AppRouter> {
       return observable((observer) => {
         const { path, input, type } = op;
 
-        sleep()
-          .then(() => {
+        routerCaller[path](input)
+          .then((res) => {
             //doStuff({});
             //const hmm = routerCaller[path](input);
             //const caller = createCaller({});
             //caller.userList({ hello: "mmamamamama" });
+            console.log("after routerCaller.greeting in idbLink.");
 
             observer.next({
               //context: res.meta,
               result: {
-                data: { welp: "gfgfdgdfgd" },
+                data: res,
                 //type: "data",
               },
             });
             observer.complete();
           })
           .catch((cause) => {
-            observer.error(TRPCClientError.from(cause, { meta }));
+            //observer.error(TRPCClientError.from(cause, { meta }));
+            observer.error(TRPCClientError.from(cause));
           });
-
-        /*
-
-        const request = universalRequester({
-          ...resolvedOpts,
-          type,
-          path,
-          input,
-          signal: op.signal,
-          headers() {
-            if (!opts.headers) {
-              return {};
-            }
-            if (typeof opts.headers === 'function') {
-              return opts.headers({
-                op,
-              });
-            }
-            return opts.headers;
-          },
-        });
-        let meta: HTTPResult['meta'] | undefined = undefined;
-
-        
-        request
-          .then((res) => {
-            meta = res.meta;
-            const transformed = transformResult(
-              res.json,
-              resolvedOpts.transformer.output,
-            );
-
-            if (!transformed.ok) {
-              observer.error(
-                TRPCClientError.from(transformed.error, {
-                  meta,
-                }),
-              );
-              return;
-            }
-            observer.next({
-              context: res.meta,
-              result: transformed.result,
-            });
-            observer.complete();
-          })
-          .catch((cause) => {
-            observer.error(TRPCClientError.from(cause, { meta }));
-          });
-          */
 
         return () => {
           // noop
