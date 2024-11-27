@@ -3,7 +3,12 @@ import { sleep } from "../../utils/sleep";
 
 import { TRPCClientError } from "@trpc/client";
 import type { OperationResultEnvelope, type TRPCLink } from "@trpc/client";
-import { routerCaller, type AppRouter } from "./server/router";
+import { appRouter, type AppRouter } from "./server/router";
+import { createCallerFactory } from "./server/trpc";
+
+const createCaller = createCallerFactory(appRouter);
+
+const routerCaller = createCaller({});
 
 export function idbLink(): TRPCLink<AppRouter> {
   return () => {

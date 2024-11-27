@@ -15,7 +15,7 @@ const nested = router({
     }),
 });
 
-const appRouter = router({
+export const appRouter = router({
   greeting: publicProcedure.query(async () => {
     await sleep(2000);
     return { hello: "from router" };
@@ -33,6 +33,6 @@ const appRouter = router({
 // This prevents us from importing server code on the client.
 export type AppRouter = typeof appRouter;
 
-export const routerCaller = appRouter.createCaller({});
+//export const routerCaller = appRouter.createCaller({});
 
 //const s = caller.greeting()
