@@ -1,6 +1,6 @@
 import { cn } from "./utils/cn";
 import { JSONE } from "./utils/jsone";
-import { trpc } from "./lib/trpc/client/trpc";
+import { api } from "./lib/trpc/api";
 
 type Props = {
   className?: string;
@@ -8,8 +8,8 @@ type Props = {
 
 export function Table2({ className }: Props) {
   //const { data, isLoading } = trpc.greeting.useQuery({ hello: "mek" });
-  const { data, isLoading } = trpc.greeting.useQuery();
-  const { mutate, isPending } = trpc.nested.mut.useMutation({
+  const { data, isLoading } = api.greeting.useQuery();
+  const { mutate, isPending } = api.nested.mut.useMutation({
     onMutate(variables) {
       return { some: "special context" };
     },

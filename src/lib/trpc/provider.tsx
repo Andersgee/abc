@@ -1,9 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-//import { httpBatchLink } from "@trpc/client";
-import { trpc } from "./trpc";
-import { customLink } from "../custom-link";
-import { idbLink } from "../idb-link";
-//import { trpc } from './utils/trpc';
+import { api } from "./api";
+import { customLink } from "./custom-link";
+import { idbLink } from "./router-link";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,20 +24,14 @@ const queryClient = new QueryClient({
   },
 });
 
-const trpcClient = trpc.createClient({
-  links: [
-    customLink,
-    idbLink(),
-    //httpBatchLink({
-    //  url: "http://localhost:3000/trpc",
-    //}),
-  ],
+const trpcClient = api.createClient({
+  links: [customLink, idbLink()],
 });
 
 export function TrpcProvider({ children }: { children: React.ReactNode }) {
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+    <api.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </trpc.Provider>
+    </api.Provider>
   );
 }

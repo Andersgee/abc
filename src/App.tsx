@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { getItem, setItem, setup } from "./lib/idb";
 
 import { Table2 } from "./table2";
-import { TrpcProvider } from "./lib/trpc/client/provider";
+import { TrpcProvider } from "./lib/trpc/provider";
 
 //const PERIOD_LENGThS = [16, 16, 16, 16, 16, 20, 20, 7, 7, 7, 7, 7]
 
