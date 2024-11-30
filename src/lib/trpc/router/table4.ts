@@ -1,21 +1,13 @@
 import { sleep } from "../../../utils/sleep";
 import { db } from "../../db/client";
+import { Table4, zTable4, zTable4Content, zTable4Id } from "../../db/schema";
 import { publicProcedure, router } from "../trpc";
-import { z } from "zod";
-
-const zId = z.object({ id: z.number() });
-const zContent = z.object({
-  hello: z.string(),
-});
-
-const zTable4 = zId.merge(zContent);
-type Table4Row = z.infer<typeof zTable4>;
 
 export const table4 = router({
   getAll: publicProcedure.query(async () => {
     await sleep();
 
-    return new Promise<Table4Row[]>((resolve, reject) => {
+    return new Promise<Table4[]>((resolve, reject) => {
       const req = db()
         .transaction("table4", "readonly")
         .objectStore("table4")
@@ -25,10 +17,10 @@ export const table4 = router({
       req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
     });
   }),
-  get: publicProcedure.input(zId).query(async ({ input }) => {
+  get: publicProcedure.input(zTable4Id).query(async ({ input }) => {
     await sleep();
 
-    return new Promise<Table4Row | null>((resolve, reject) => {
+    return new Promise<Table4 | null>((resolve, reject) => {
       const req = db()
         .transaction("table4", "readonly")
         .objectStore("table4")
@@ -39,7 +31,7 @@ export const table4 = router({
         resolve((event.target as IDBRequest).result ?? null);
     });
   }),
-  add: publicProcedure.input(zContent).mutation(async ({ input }) => {
+  add: publicProcedure.input(zTable4Content).mutation(async ({ input }) => {
     await sleep();
 
     return new Promise<number>((resolve, reject) => {
@@ -81,7 +73,7 @@ export const table4 = router({
     });
   }),
 
-  delete: publicProcedure.input(zId).mutation(async ({ input }) => {
+  delete: publicProcedure.input(zTable4Id).mutation(async ({ input }) => {
     await sleep();
 
     return new Promise<void>((resolve, reject) => {

@@ -29,6 +29,7 @@ export async function initIndexedDB(
   });
 
   //seed
+  /*
   const TABLE_NAME = "table4";
   await new Promise<void>((resolve, reject) => {
     const table4 = db()
@@ -50,15 +51,45 @@ export async function initIndexedDB(
 
     table4.add({ hello: "added without id hmmmm" });
     table4.add({ hello: "another added without id" });
+
     //giving your own id doesnt work
     //table4.add({ hello: "this one I gave my own id number", id: 3 });
     //table4.add({ hello: "this one I gave my own id number 7", id: 7 });
   });
+  */
+}
+
+async function push_table4_synchronous() {
+  const TABLE_NAME = "table4";
+
+  //this is the same as table2 except when adding objects the id prop is optional
+  //eg BOTH {id:"yep", hello: "world"} and  {hello: "world"} is fine
+  //test this... how does it know if the id prop is string or number... or something else, when adding an object without id prop.
+  //docs say it just ints, starting at 1, lets see if thats true
+  //OK, TESTED. id is indeed a regular Number starting at 1
+
+  if (db().objectStoreNames.contains(TABLE_NAME)) {
+    console.log("early return. idb already has TABLE_NAME:", TABLE_NAME);
+    return;
+  }
+
+  const table = db().createObjectStore(TABLE_NAME, {
+    keyPath: "id",
+    autoIncrement: true,
+  });
+
+  //potentially add additional indexes
+  //table.createIndex("myotherindexedprop", "myotherindexedprop", { unique: false });
+
+  //and possibly constraints (unique)
+  //https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/createIndex#parameters
+  //table.createIndex("email", "email", { unique: true });
 }
 
 //there are pretty much only 4 kinds of tables (aka object stores) available
 //https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#structuring_the_database
 
+/*
 async function push_table1(): Promise<void> {
   return new Promise((resolve, reject) => {
     //can hold any value but must manually supply key when adding values
@@ -97,28 +128,9 @@ async function push_table3(): Promise<void> {
     table.transaction.oncomplete = () => resolve();
   });
 }
+*/
 
-async function push_table4_synchronous() {
-  const TABLE_NAME = "table4";
-
-  //this is the same as table2 except when adding objects the id prop is optional
-  //eg BOTH {id:"yep", hello: "world"} and  {hello: "world"} is fine
-  //test this... how does it know if the id prop is string or number... or something else, when adding an object without id prop.
-  //docs say it just ints, starting at 1, lets see if thats true
-  //OK, TESTED. id is indeed a regular Number starting at 1
-
-  if (db().objectStoreNames.contains(TABLE_NAME)) {
-    console.log("early return. idb already has TABLE_NAME:", TABLE_NAME);
-    return;
-  }
-
-  const table = db().createObjectStore(TABLE_NAME, {
-    keyPath: "id",
-    autoIncrement: true,
-  });
-  //table.createIndex("name", "name", { unique: true });
-}
-
+/*
 async function push_table4() {
   const TABLE_NAME = "table4";
   await new Promise<void>((resolve, reject) => {
@@ -144,3 +156,4 @@ async function push_table4() {
     table.transaction.oncomplete = () => resolve();
   });
 }
+*/
