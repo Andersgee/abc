@@ -2,6 +2,7 @@ import { cn } from "./utils/cn";
 import { JSONE } from "./utils/jsone";
 import { api } from "./lib/trpc/api";
 import { useRef } from "react";
+import type { Table4 as Table4Type } from "./lib/db/schema";
 
 type Props = {
   className?: string;
@@ -16,7 +17,7 @@ export function Table4({ className }: Props) {
       {data?.map((row) => (
         <div key={row.id} className="flex">
           <InputPut row={row} />
-          <ButtonDelete row={row} />
+          <ButtonDelete id={row.id} />
         </div>
       ))}
       <InputAdd />
@@ -27,7 +28,7 @@ export function Table4({ className }: Props) {
   );
 }
 
-function InputPut({ row }: { row: { id: number; hello: string } }) {
+function InputPut({ row }: { row: Table4Type }) {
   const ref = useRef<HTMLInputElement>(null);
 
   const utils = api.useUtils();
@@ -95,7 +96,7 @@ function InputAdd() {
   );
 }
 
-function ButtonDelete({ row }: { row: { id: number; hello: string } }) {
+function ButtonDelete({ id }: { id: number }) {
   const utils = api.useUtils();
   const { mutate } = api.table4.delete.useMutation({
     onSuccess(data) {
@@ -111,7 +112,7 @@ function ButtonDelete({ row }: { row: { id: number; hello: string } }) {
     <button
       className="p-2 bg-red-400 block"
       onClick={() => {
-        mutate({ id: row.id });
+        mutate({ id });
       }}
     >
       delete
