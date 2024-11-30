@@ -2,7 +2,7 @@ import { db } from "./client";
 
 export async function initIndexedDB(
   name = "MyTestDatabase",
-  version = 14
+  version = 15
 ): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const openDbRequest = indexedDB.open(name, version);
@@ -50,8 +50,9 @@ export async function initIndexedDB(
 
     table4.add({ hello: "added without id hmmmm" });
     table4.add({ hello: "another added without id" });
-    table4.add({ hello: "this one I gave my own id number" });
-    table4.add({ hello: "this one I gave my own id number 7" });
+    //giving your own id doesnt work
+    //table4.add({ hello: "this one I gave my own id number", id: 3 });
+    //table4.add({ hello: "this one I gave my own id number 7", id: 7 });
   });
 }
 

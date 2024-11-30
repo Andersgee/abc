@@ -14,12 +14,22 @@ export function Table4({ className }: Props) {
   });
 
   const { mutate: add, isPending } = api.table4.add.useMutation({
-    onSuccess(data, variables, context) {
+    onSuccess(data) {
       utils.table4.invalidate();
-      console.log("onSuccess, data:", data);
+      console.log("add, onSuccess, data:", data);
     },
-    onError(error, variables, context) {
-      console.log("onError, error:", error);
+    onError(error) {
+      console.log("add, onError, error:", error);
+    },
+  });
+
+  const { mutate: clear } = api.table4.clear.useMutation({
+    onSuccess(data) {
+      utils.table4.invalidate();
+      console.log("clear, onSuccess, data:", data);
+    },
+    onError(error) {
+      console.log("clear, onError, error:", error);
     },
   });
 
@@ -31,8 +41,17 @@ export function Table4({ className }: Props) {
       <div>isLoading2 {isLoading2 ? "yep" : "nope"}</div>
       <div>data2: {JSONE.stringify(data2)}</div>
 
-      <button onClick={() => add({ hello: "from onclick" })}>CLICK ME</button>
+      <button
+        className="p-3 bg-green-500"
+        onClick={() => add({ hello: "from onclick" })}
+      >
+        ADD
+      </button>
       <div>isPending {isPending ? "yep" : "nope"}</div>
+
+      <button className="p-3 bg-red-400" onClick={() => clear()}>
+        CLEAR
+      </button>
     </div>
   );
 }

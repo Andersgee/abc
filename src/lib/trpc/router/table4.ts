@@ -3,32 +3,31 @@ import { db } from "../../db/client";
 import { publicProcedure, router } from "../trpc";
 import { z } from "zod";
 
+type Table4Row = {
+  id: number;
+  hello: string;
+};
+
 export const table4 = router({
   getAll: publicProcedure.query(async () => {
-    await sleep(2000);
+    await sleep();
 
-    return new Promise((resolve, reject) => {
+    return new Promise<Table4Row[]>((resolve, reject) => {
       const req = db()
         .transaction("table4", "readonly")
         .objectStore("table4")
         .getAll();
 
       req.onerror = () => reject();
-      req.onsuccess = (event) =>
-        resolve(
-          (event.target as IDBRequest).result as Array<{
-            id: number;
-            hello: string;
-          }>
-        );
+      req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
     });
   }),
   get: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      await sleep(2000);
+      await sleep();
 
-      return new Promise((resolve, reject) => {
+      return new Promise<Table4Row | null>((resolve, reject) => {
         const req = db()
           .transaction("table4", "readonly")
           .objectStore("table4")
@@ -36,24 +35,49 @@ export const table4 = router({
 
         req.onerror = () => reject();
         req.onsuccess = (event) =>
-          resolve(
-            (event.target as IDBRequest).result as Array<{
-              id: number;
-              hello: string;
-            }>
-          );
+          resolve((event.target as IDBRequest).result ?? null);
       });
     }),
   add: publicProcedure
     .input(z.object({ hello: z.string() }))
     .mutation(async ({ input }) => {
-      await sleep(2000);
+      await sleep();
+
+      return new Promise<number>((resolve, reject) => {
+        const req = db()
+          .transaction("table4", "readwrite")
+          .objectStore("table4")
+          .add(input);
+
+        req.onerror = () => reject();
+        req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
+      });
+    }),
+
+  clear: publicProcedure.mutation(async () => {
+    await sleep();
+
+    return new Promise<void>((resolve, reject) => {
+      const req = db()
+        .transaction("table4", "readwrite")
+        .objectStore("table4")
+        .clear();
+
+      req.onerror = () => reject();
+      req.onsuccess = () => resolve();
+    });
+  }),
+
+  put: publicProcedure
+    .input(z.object({ id: z.number(), hello: z.string() }))
+    .mutation(async (input) => {
+      await sleep();
 
       return new Promise((resolve, reject) => {
         const req = db()
           .transaction("table4", "readwrite")
           .objectStore("table4")
-          .add(input);
+          .put(input);
 
         req.onerror = () => reject();
         req.onsuccess = (event) =>
@@ -65,6 +89,7 @@ export const table4 = router({
           );
       });
     }),
+
   //mut: publicProcedure
   //  .input(z.object({ stuff: z.string() }))
   //  .mutation(async ({ input }) => {
