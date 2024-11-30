@@ -70,30 +70,33 @@ export const table4 = router({
 
   put: publicProcedure
     .input(z.object({ id: z.number(), hello: z.string() }))
-    .mutation(async (input) => {
+    .mutation(async ({ input }) => {
       await sleep();
 
-      return new Promise((resolve, reject) => {
+      return new Promise<number>((resolve, reject) => {
         const req = db()
           .transaction("table4", "readwrite")
           .objectStore("table4")
           .put(input);
 
         req.onerror = () => reject();
-        req.onsuccess = (event) =>
-          resolve(
-            (event.target as IDBRequest).result as Array<{
-              id: number;
-              hello: string;
-            }>
-          );
+        req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
       });
     }),
 
-  //mut: publicProcedure
-  //  .input(z.object({ stuff: z.string() }))
-  //  .mutation(async ({ input }) => {
-  //    await sleep(2000);
-  //    return { echoed_nested_mutation_input: input };
-  //  }),
+  delete: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await sleep();
+
+      return new Promise<void>((resolve, reject) => {
+        const req = db()
+          .transaction("table4", "readwrite")
+          .objectStore("table4")
+          .delete(input.id);
+
+        req.onerror = () => reject();
+        req.onsuccess = () => resolve();
+      });
+    }),
 });
