@@ -25,7 +25,8 @@ const queryClient = new QueryClient({
 });
 
 const trpcClient = api.createClient({
-  links: [debugLink, routerCallerLink()],
+  //links: [debugLink, routerCallerLink()],
+  links: [routerCallerLink()],
 });
 
 export function TrpcProvider({ children }: { children: React.ReactNode }) {

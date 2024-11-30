@@ -1,3 +1,3 @@
-export async function sleep(ms = 1000) {
+export async function sleep(ms = 1) {
   return await new Promise((resolve) => setTimeout(resolve, ms));
 }
