@@ -46,7 +46,7 @@ function InputPut({ row }: { row: { id: number; hello: string } }) {
       onSubmit={(e) => {
         e.preventDefault();
         const str = ref.current?.value;
-        if (str) {
+        if (str !== undefined) {
           mutate({ id: row.id, hello: str });
         }
       }}
