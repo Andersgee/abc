@@ -2,10 +2,10 @@ import { sleep } from "../../../utils/sleep";
 import { publicProcedure, router } from "../trpc";
 import { z } from "zod";
 import { nestedRouter } from "./nested";
-import { table4 } from "./table4";
+import { table4Router } from "./table4";
 
 export const idbRouter = router({
-  table4,
+  table4: table4Router,
   greeting: publicProcedure.query(async () => {
     await sleep(2000);
     return { hello: "from router" };

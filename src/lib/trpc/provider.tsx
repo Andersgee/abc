@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { api } from "./api";
-import { debugLink } from "./debug-link";
+import { idb } from "./hook";
+//import { debugLink } from "./debug-link";
 import { routerCallerLink } from "./router-caller-link";
 
 const queryClient = new QueryClient({
@@ -24,15 +24,15 @@ const queryClient = new QueryClient({
   },
 });
 
-const trpcClient = api.createClient({
+const trpcClient = idb.createClient({
   //links: [debugLink, routerCallerLink()],
   links: [routerCallerLink()],
 });
 
 export function TrpcProvider({ children }: { children: React.ReactNode }) {
   return (
-    <api.Provider client={trpcClient} queryClient={queryClient}>
+    <idb.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </api.Provider>
+    </idb.Provider>
   );
 }

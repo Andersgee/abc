@@ -3,14 +3,16 @@ import { db } from "../../db/client";
 import { Table4, zTable4, zTable4Content, zTable4Id } from "../../db/schema";
 import { publicProcedure, router } from "../trpc";
 
-export const table4 = router({
+const TABLE_NAME = "table4";
+
+export const table4Router = router({
   getAll: publicProcedure.query(async () => {
     await sleep();
 
     return new Promise<Table4[]>((resolve, reject) => {
       const req = db()
-        .transaction("table4", "readonly")
-        .objectStore("table4")
+        .transaction(TABLE_NAME, "readonly")
+        .objectStore(TABLE_NAME)
         .getAll();
 
       req.onerror = () => reject();
@@ -22,8 +24,8 @@ export const table4 = router({
 
     return new Promise<Table4 | null>((resolve, reject) => {
       const req = db()
-        .transaction("table4", "readonly")
-        .objectStore("table4")
+        .transaction(TABLE_NAME, "readonly")
+        .objectStore(TABLE_NAME)
         .get(input.id);
 
       req.onerror = () => reject();
@@ -36,8 +38,8 @@ export const table4 = router({
 
     return new Promise<number>((resolve, reject) => {
       const req = db()
-        .transaction("table4", "readwrite")
-        .objectStore("table4")
+        .transaction(TABLE_NAME, "readwrite")
+        .objectStore(TABLE_NAME)
         .add(input);
 
       req.onerror = () => reject();
@@ -50,8 +52,8 @@ export const table4 = router({
 
     return new Promise<void>((resolve, reject) => {
       const req = db()
-        .transaction("table4", "readwrite")
-        .objectStore("table4")
+        .transaction(TABLE_NAME, "readwrite")
+        .objectStore(TABLE_NAME)
         .clear();
 
       req.onerror = () => reject();
@@ -64,8 +66,8 @@ export const table4 = router({
 
     return new Promise<number>((resolve, reject) => {
       const req = db()
-        .transaction("table4", "readwrite")
-        .objectStore("table4")
+        .transaction(TABLE_NAME, "readwrite")
+        .objectStore(TABLE_NAME)
         .put(input);
 
       req.onerror = () => reject();
@@ -78,8 +80,8 @@ export const table4 = router({
 
     return new Promise<void>((resolve, reject) => {
       const req = db()
-        .transaction("table4", "readwrite")
-        .objectStore("table4")
+        .transaction(TABLE_NAME, "readwrite")
+        .objectStore(TABLE_NAME)
         .delete(input.id);
 
       req.onerror = () => reject();
