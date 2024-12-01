@@ -33,6 +33,20 @@ export const table4Router = router({
         resolve((event.target as IDBRequest).result ?? null);
     });
   }),
+  count: publicProcedure.query(async () => {
+    await sleep();
+
+    return new Promise<number>((resolve, reject) => {
+      const req = db()
+        .transaction(TABLE_NAME, "readonly")
+        .objectStore(TABLE_NAME)
+        .count();
+
+      req.onerror = () => reject();
+      req.onsuccess = (event) =>
+        resolve((event.target as IDBRequest).result ?? null);
+    });
+  }),
   add: publicProcedure.input(zTable4Content).mutation(async ({ input }) => {
     await sleep();
 

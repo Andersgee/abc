@@ -2,7 +2,7 @@ import { db } from "./client";
 
 export async function initIndexedDB(
   name = "MyTestDatabase",
-  version = 15
+  version = 16
 ): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const openDbRequest = indexedDB.open(name, version);

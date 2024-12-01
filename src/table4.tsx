@@ -16,6 +16,7 @@ export function Table4({ className }: Props) {
   return (
     <div className={cn("space-y-2", className)}>
       <div>isLoading {isLoading ? "yep" : "nope"}</div>
+      <Count />
       {data?.map((row) => (
         <div key={row.id} className="flex items-center gap-2">
           <InputPut row={row} />
@@ -118,4 +119,10 @@ function ButtonClear() {
   });
 
   return <ButtonDanger onClick={() => mutate()}>CLEAR ALL</ButtonDanger>;
+}
+
+function Count() {
+  const { data } = idb.table4.count.useQuery();
+
+  return <div>count:{data}</div>;
 }
