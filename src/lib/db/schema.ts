@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const zTable4Id = z.object({ id: z.number() });
+export const zTable4Id = z.object({ id: z.string() });
 export const zTable4Content = z.object({
   hello: z.string(),
 });

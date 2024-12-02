@@ -5,6 +5,7 @@ import { useRef } from "react";
 import type { Table4 as Table4Type } from "./lib/db/schema";
 import { ButtonDanger } from "./components/button";
 import { Input } from "./components/input";
+import { uuid } from "./utils/uuid";
 
 type Props = {
   className?: string;
@@ -81,7 +82,7 @@ function InputAdd() {
         e.preventDefault();
 
         if (ref.current?.value) {
-          mutate({ hello: ref.current.value });
+          mutate({ hello: ref.current.value, id: uuid() });
           ref.current.value = "";
         }
       }}
@@ -91,7 +92,7 @@ function InputAdd() {
   );
 }
 
-function ButtonDelete({ id }: { id: number }) {
+function ButtonDelete({ id }: { id: string }) {
   const utils = idb.useUtils();
   const { mutate } = idb.table4.delete.useMutation({
     onSuccess(data) {
