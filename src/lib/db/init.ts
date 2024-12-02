@@ -1,8 +1,8 @@
 import { db } from "./client";
 
 export async function initIndexedDB(
-  name = "MyTestDatabase",
-  version = 19
+  name = "MyTestDatabase2",
+  version = 9
 ): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const openDbRequest = indexedDB.open(name, version);
@@ -17,6 +17,7 @@ export async function initIndexedDB(
       resolve();
     };
 
+    /*
     openDbRequest.onupgradeneeded = (event) => {
       console.log("request.onupgradeneeded");
       window.db = (event.target as IDBOpenDBRequest).result;
@@ -26,6 +27,8 @@ export async function initIndexedDB(
       //push_table3();
       push_table4_synchronous();
     };
+    */
+    openDbRequest.onupgradeneeded = handlUpgradeNeeded;
   });
 
   //seed
@@ -57,11 +60,70 @@ export async function initIndexedDB(
     //table4.add({ hello: "this one I gave my own id number 7", id: 7 });
   });
   */
+
+  //createColumn("table4", "somecol");
 }
 
-function createTable(name: string, options?: IDBObjectStoreParameters) {
+function listFromDOMStringList(indexNames: DOMStringList) {
+  const v: string[] = [];
+  for (let i = 0; i < indexNames.length; i++) {
+    v.push(indexNames.item(i)!);
+  }
+  return v;
+}
+
+function handlUpgradeNeeded(event: IDBVersionChangeEvent) {
+  // Get a reference to the request related to this event
+  // @type IDBOpenRequest (a specialized type of IDBRequest)
+  const request = event.target as IDBOpenDBRequest;
+
+  // Get a reference to the IDBDatabase object for this request
+  // @type IDBDatabase
+  window.db = request.result;
+
+  const tx = request.transaction!;
+  const table4 = createTable("table4") ?? tx.objectStore("table4");
+
+  const existingIndexNames = listFromDOMStringList(table4.indexNames);
+
+  const desiredIndexNames = ["korp", "stuff"];
+  //create missing indexes and remove indexes that should be here
+  //possibly remove data before removing index?
+  const indexNamesToAdd = desiredIndexNames.filter(
+    (x) => !existingIndexNames.includes(x)
+  );
+  const indexNamesToRemove = existingIndexNames.filter(
+    (x) => !desiredIndexNames.includes(x)
+  );
+  console.log(
+    JSON.stringify(
+      {
+        existingIndexNames,
+        indexNamesToAdd,
+        indexNamesToRemove,
+      },
+      null,
+      2
+    )
+  );
+  for (const indexName of indexNamesToAdd) {
+    table4.createIndex(indexName, indexName);
+  }
+  for (const indexName of indexNamesToRemove) {
+    table4.deleteIndex(indexName);
+  }
+
+  //console.log("indexNames", indexNames);
+
+  // Add a new index to the existing object store
+  //table.createIndex("stuff", "stuff");
+  //store.createIndex(...);
+}
+
+function createTable(tableName: string, options?: IDBObjectStoreParameters) {
   try {
-    db().createObjectStore(name, options);
+    const table = db().createObjectStore(tableName, options);
+    return table;
   } catch (error) {
     if (error instanceof DOMException && error.name === "ConstraintError") {
       //expected if table already exist
@@ -71,10 +133,31 @@ function createTable(name: string, options?: IDBObjectStoreParameters) {
   }
 }
 
+function createColumn(
+  table: IDBObjectStore,
+  indexName: string,
+  options?: IDBIndexParameters
+) {
+  try {
+    const ind = table.createIndex(indexName, indexName, options);
+    return ind;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "ConstraintError") {
+      //expected if index already exist
+    } else {
+      console.warn("createIndex, error:", error);
+    }
+  }
+
+  const t = table.createIndex(indexName, indexName, options);
+}
+
 async function push_table4_synchronous() {
   const TABLE_NAME = "table4";
 
   createTable(TABLE_NAME, { keyPath: "id", autoIncrement: true });
+  //createColumn("welpor", "somecol");
+  //createColumn(TABLE_NAME, "someuniquecol", {unique: true})
 
   //potentially add additional indexes
   //table.createIndex("myotherindexedprop", "myotherindexedprop", { unique: false });
@@ -98,7 +181,7 @@ async function push_table4_synchronous_welp() {
     return;
   }
 
-  const _table = db().createObjectStore(TABLE_NAME, {
+  const table = db().createObjectStore(TABLE_NAME, {
     keyPath: "id",
     autoIncrement: true,
   });
