@@ -82,11 +82,12 @@ function handlUpgradeNeeded(event: IDBVersionChangeEvent) {
   window.db = request.result;
 
   const tx = request.transaction!;
+
   const table4 = createTable("table4") ?? tx.objectStore("table4");
 
   const existingIndexNames = listFromDOMStringList(table4.indexNames);
-
   const desiredIndexNames = ["korp", "stuff"];
+
   //create missing indexes and remove indexes that should be here
   //possibly remove data before removing index?
   const indexNamesToAdd = desiredIndexNames.filter(
@@ -106,11 +107,15 @@ function handlUpgradeNeeded(event: IDBVersionChangeEvent) {
       2
     )
   );
+
   for (const indexName of indexNamesToAdd) {
-    table4.createIndex(indexName, indexName);
+    createColumn(table4, indexName);
+    //table4.createIndex(indexName, indexName);
   }
   for (const indexName of indexNamesToRemove) {
-    table4.deleteIndex(indexName);
+    //const isUnique = table4.index(indexName).unique
+    //table4.deleteIndex(indexName);
+    deleteColumn(table4, indexName);
   }
 
   //console.log("indexNames", indexNames);
@@ -142,14 +147,25 @@ function createColumn(
     const ind = table.createIndex(indexName, indexName, options);
     return ind;
   } catch (error) {
-    if (error instanceof DOMException && error.name === "ConstraintError") {
-      //expected if index already exist
+    if (error instanceof DOMException) {
+      console.warn("createIndex, error.name:", error.name);
     } else {
-      console.warn("createIndex, error:", error);
+      console.warn("createIndex, other error:", error);
     }
+    //if (error instanceof DOMException && error.name === "ConstraintError") {
+    //  //expected if index already exist
+    //} else {
+    //  console.warn("createIndex, error:", error);
+    //}
   }
+}
 
-  const t = table.createIndex(indexName, indexName, options);
+function deleteColumn(table: IDBObjectStore, indexName: string) {
+  try {
+    table.deleteIndex(indexName);
+  } catch (error) {
+    console.warn("deleteIndex, error:", error);
+  }
 }
 
 async function push_table4_synchronous() {
