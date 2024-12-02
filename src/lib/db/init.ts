@@ -2,7 +2,7 @@ import { db } from "./client";
 
 export async function initIndexedDB(
   name = "MyTestDatabase",
-  version = 16
+  version = 19
 ): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const openDbRequest = indexedDB.open(name, version);
@@ -59,7 +59,32 @@ export async function initIndexedDB(
   */
 }
 
+function createTable(name: string, options?: IDBObjectStoreParameters) {
+  try {
+    db().createObjectStore(name, options);
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "ConstraintError") {
+      //expected if table already exist
+    } else {
+      console.warn("createObjectStore, error:", error);
+    }
+  }
+}
+
 async function push_table4_synchronous() {
+  const TABLE_NAME = "table4";
+
+  createTable(TABLE_NAME, { keyPath: "id", autoIncrement: true });
+
+  //potentially add additional indexes
+  //table.createIndex("myotherindexedprop", "myotherindexedprop", { unique: false });
+
+  //and possibly constraints (unique)
+  //https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/createIndex#parameters
+  //table.createIndex("email", "email", { unique: true });
+}
+
+async function push_table4_synchronous_welp() {
   const TABLE_NAME = "table4";
 
   //this is the same as table2 except when adding objects the id prop is optional
@@ -73,7 +98,7 @@ async function push_table4_synchronous() {
     return;
   }
 
-  const table = db().createObjectStore(TABLE_NAME, {
+  const _table = db().createObjectStore(TABLE_NAME, {
     keyPath: "id",
     autoIncrement: true,
   });
