@@ -53,7 +53,9 @@ function Test2() {
   return (
     <div>
       <div>Sök</div>
-      {isSearching ? <div>söker..</div> : null}
+      <div className="relative">
+        {isSearching ? <div className="absolute">söker..</div> : null}
+      </div>
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}

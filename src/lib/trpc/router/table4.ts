@@ -23,7 +23,7 @@ export const table4Router = router({
   filter: publicProcedure
     .input(z.object({ value: z.string() }))
     .query(async ({ input }) => {
-      await sleep(3000);
+      await sleep();
       return await dbfilter("table4", ({ hello }) =>
         hello.includes(input.value)
       );
