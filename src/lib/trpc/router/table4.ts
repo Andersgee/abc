@@ -4,6 +4,7 @@ import { db } from "../../db/client";
 import { Table4, zTable4, zTable4Content, zTable4Id } from "../../db/schema";
 import { publicProcedure, router } from "../trpc";
 
+//
 const TABLE_NAME = "table4";
 
 const zPredicate = z.function().args(zTable4).returns(z.boolean());
