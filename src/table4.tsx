@@ -43,17 +43,17 @@ function Test() {
 
 function Test2() {
   const [value, setValue] = useState("");
-  const { data, isFetching } = idb.table4.filter.useQuery(
+  const { data, isFetching, isLoading } = idb.table4.filter.useQuery(
     { value },
     {
       placeholderData: (x) => x, // aka keepPreviousData
     }
   );
-
+  const isSearching = isFetching && !isLoading; //fetching but not first time
   return (
     <div>
       <div>Sök</div>
-      {isFetching ? <div>laddar..</div> : null}
+      {isSearching ? <div>söker..</div> : null}
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
