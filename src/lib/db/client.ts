@@ -24,9 +24,36 @@ export function dbget<T extends keyof DB>(
   });
 }
 
-export function dbgetAll<T extends keyof DB>(tableName: T) {
+export function dbgetKey<T extends keyof DB>(
+  tableName: T,
+  query: IDBValidKey | IDBKeyRange
+) {
+  return new Promise<DB[T]["id"] | null>((resolve, reject) => {
+    const req = read(tableName).getKey(query);
+    req.onerror = () => reject();
+    req.onsuccess = (e) => resolve((e.target as IDBRequest).result ?? null);
+  });
+}
+
+export function dbgetAll<T extends keyof DB>(
+  tableName: T,
+  query?: IDBValidKey | IDBKeyRange | null,
+  count?: number
+) {
   return new Promise<Array<DB[T]>>((resolve, reject) => {
-    const req = read(tableName).getAll();
+    const req = read(tableName).getAll(query, count);
+    req.onerror = () => reject();
+    req.onsuccess = (e) => resolve((e.target as IDBRequest).result);
+  });
+}
+
+export function dbgetAllKeys<T extends keyof DB>(
+  tableName: T,
+  query?: IDBValidKey | IDBKeyRange | null,
+  count?: number
+) {
+  return new Promise<Array<DB[T]["id"]>>((resolve, reject) => {
+    const req = read(tableName).getAllKeys(query, count);
     req.onerror = () => reject();
     req.onsuccess = (e) => resolve((e.target as IDBRequest).result);
   });
@@ -44,7 +71,7 @@ export function dbadd<T extends keyof DB, V extends DB[T]>(
   tableName: T,
   value: V
 ) {
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<DB[T]["id"]>((resolve, reject) => {
     const req = write(tableName).add(value);
     req.onerror = () => reject();
     req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
@@ -63,7 +90,7 @@ export function dbput<T extends keyof DB, V extends DB[T]>(
   tableName: T,
   value: V
 ) {
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<DB[T]["id"]>((resolve, reject) => {
     const req = write(tableName).put(value);
     req.onerror = () => reject();
     req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
@@ -80,26 +107,3 @@ export function dbdelete<T extends keyof DB>(
     req.onsuccess = () => resolve();
   });
 }
-
-/*
-export async function setItem(obj: X) {
-  const storeName = "bodypart";
-  return new Promise((resolve, reject) => {
-    if (db) {
-      const store = db
-        .transaction("bodypart", "readwrite")
-        .objectStore(storeName);
-
-      const req = store.put(obj);
-      req.onsuccess = (event) => {
-        resolve(event.target.result);
-      };
-      req.onerror = (event) => {
-        reject(event.target.error?.message);
-      };
-    } else {
-      reject();
-    }
-  });
-}
-*/
