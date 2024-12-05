@@ -1,6 +1,15 @@
 import { z } from "zod";
 import { sleep } from "../../../utils/sleep";
-import { db, dbget, dbgetAll } from "../../db/client";
+import {
+  db,
+  dbadd,
+  dbclear,
+  dbcount,
+  dbdelete,
+  dbget,
+  dbgetAll,
+  dbput,
+} from "../../db/client";
 import { Table4, zTable4, zTable4Content, zTable4Id } from "../../db/schema";
 import { publicProcedure, router } from "../trpc";
 
@@ -71,71 +80,25 @@ export const table4Router = router({
   }),
   count: publicProcedure.query(async () => {
     await sleep();
-
-    return new Promise<number>((resolve, reject) => {
-      const req = db()
-        .transaction(TABLE_NAME, "readonly")
-        .objectStore(TABLE_NAME)
-        .count();
-
-      req.onerror = () => reject();
-      req.onsuccess = (event) =>
-        resolve((event.target as IDBRequest).result ?? null);
-    });
+    return await dbcount("table4");
   }),
   add: publicProcedure.input(zTable4).mutation(async ({ input }) => {
     await sleep();
-
-    return new Promise<string>((resolve, reject) => {
-      const req = db()
-        .transaction(TABLE_NAME, "readwrite")
-        .objectStore(TABLE_NAME)
-        .add(input);
-
-      req.onerror = () => reject();
-      req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
-    });
+    return await dbadd("table4", input);
   }),
 
   clear: publicProcedure.mutation(async () => {
     await sleep();
-
-    return new Promise<void>((resolve, reject) => {
-      const req = db()
-        .transaction(TABLE_NAME, "readwrite")
-        .objectStore(TABLE_NAME)
-        .clear();
-
-      req.onerror = () => reject();
-      req.onsuccess = () => resolve();
-    });
+    return await dbclear("table4");
   }),
 
   put: publicProcedure.input(zTable4).mutation(async ({ input }) => {
     await sleep();
-
-    return new Promise<string>((resolve, reject) => {
-      const req = db()
-        .transaction(TABLE_NAME, "readwrite")
-        .objectStore(TABLE_NAME)
-        .put(input);
-
-      req.onerror = () => reject();
-      req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
-    });
+    return await dbput("table4", input);
   }),
 
   delete: publicProcedure.input(zTable4Id).mutation(async ({ input }) => {
     await sleep();
-
-    return new Promise<void>((resolve, reject) => {
-      const req = db()
-        .transaction(TABLE_NAME, "readwrite")
-        .objectStore(TABLE_NAME)
-        .delete(input.id);
-
-      req.onerror = () => reject();
-      req.onsuccess = () => resolve();
-    });
+    return await dbdelete("table4", input.id);
   }),
 });
