@@ -1,7 +1,7 @@
 import { cn } from "./utils/cn";
 import { JSONE } from "./utils/jsone";
 import { idb } from "./lib/trpc/hook";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Table4 as Table4Type } from "./lib/db/schema";
 import { ButtonDanger } from "./components/button";
 import { Input } from "./components/input";
@@ -30,6 +30,7 @@ export function Table4({ className }: Props) {
       <pre>data: {JSONE.stringify(data, 2)}</pre>
 
       <Test />
+      <Test2 />
     </div>
   );
 }
@@ -38,6 +39,27 @@ function Test() {
   const { data } = idb.table4.getAllWithCursor.useQuery({});
 
   return <div>{JSONE.stringify(data, 2)}</div>;
+}
+function Test2() {
+  const [value, setValue] = useState("stu");
+  const utils = idb.useUtils();
+  const { data } = idb.table4.filter.useQuery((x) => x.hello.includes(value));
+  useEffect(() => {
+    utils.table4.filter.refetch();
+  }, [value]);
+
+  return (
+    <div>
+      <div>Sök</div>
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="w-56"
+        placeholder="add"
+      />
+      {JSONE.stringify(data, 2)}
+    </div>
+  );
 }
 
 function InputPut({ row }: { row: Table4Type }) {

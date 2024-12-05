@@ -22,13 +22,15 @@ async function iterateCursor<T>(cursor: IDBCursorWithValue) {
   });
 }
 
+const zPredicate = z.function().args(zTable4).returns(z.boolean());
+
 export const table4Router = router({
-  getAllWithCursor: publicProcedure.input(z.object({})).query(async () => {
+  filter: publicProcedure.input(zPredicate).query(async ({ input }) => {
     await sleep();
 
     return new Promise<Table4[]>((resolve, reject) => {
       const req = db()
-        .transaction(TABLE_NAME, "readwrite")
+        .transaction(TABLE_NAME, "readonly")
         .objectStore(TABLE_NAME)
         .openCursor(null, "next");
 
@@ -40,7 +42,39 @@ export const table4Router = router({
         if (cursor) {
           // cursor.value contains the current record being iterated through
           // this is where you'd do something with the result
-          console.log("cursor.value:", cursor.value);
+          if (input(cursor.value)) {
+            console.log("true, include:", cursor.value);
+          } else {
+            console.log("false (dont include):", cursor.value);
+          }
+          cursor.continue();
+        } else {
+          // no more results
+          //resolve((event.target as IDBRequest).result);
+          resolve([]);
+        }
+      };
+    });
+  }),
+
+  getAllWithCursor: publicProcedure.input(z.object({})).query(async () => {
+    await sleep();
+
+    return new Promise<Table4[]>((resolve, reject) => {
+      const req = db()
+        .transaction(TABLE_NAME, "readonly")
+        .objectStore(TABLE_NAME)
+        .openCursor(null, "next");
+
+      //const rows = [];
+      req.onerror = () => reject();
+      req.onsuccess = (event) => {
+        const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
+
+        if (cursor) {
+          // cursor.value contains the current record being iterated through
+          // this is where you'd do something with the result
+          //console.log("cursor.value:", cursor.value);
           cursor.continue();
         } else {
           // no more results
