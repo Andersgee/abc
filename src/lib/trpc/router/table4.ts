@@ -6,52 +6,32 @@ import { publicProcedure, router } from "../trpc";
 
 const TABLE_NAME = "table4";
 
-async function iterateCursor<T>(cursor: IDBCursorWithValue) {
-  return new Promise<T[]>((resolve) => {
-    //const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
-    const rows: T[] = [];
-    if (cursor) {
-      // cursor.value contains the current record being iterated through
-      // this is where you'd do something with the result
-      rows.push(cursor.value);
-      cursor.continue();
-    } else {
-      // no more results
-      resolve(rows);
-    }
-  });
-}
-
 const zPredicate = z.function().args(zTable4).returns(z.boolean());
 
 export const table4Router = router({
   filter: publicProcedure.input(zPredicate).query(async ({ input }) => {
     await sleep();
 
-    return new Promise<Table4[]>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
+      const rows: Table4[] = [];
+
       const req = db()
         .transaction(TABLE_NAME, "readonly")
         .objectStore(TABLE_NAME)
         .openCursor(null, "next");
 
-      //const rows = [];
       req.onerror = () => reject();
       req.onsuccess = (event) => {
         const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
 
         if (cursor) {
-          // cursor.value contains the current record being iterated through
-          // this is where you'd do something with the result
           if (input(cursor.value)) {
-            console.log("true, include:", cursor.value);
-          } else {
-            console.log("false (dont include):", cursor.value);
+            rows.push(cursor.value);
           }
           cursor.continue();
         } else {
           // no more results
-          //resolve((event.target as IDBRequest).result);
-          resolve([]);
+          resolve(rows);
         }
       };
     });

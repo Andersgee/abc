@@ -16,6 +16,7 @@ export function Table4({ className }: Props) {
 
   return (
     <div className={cn("space-y-2", className)}>
+      <Test2 />
       <div>isLoading {isLoading ? "yep" : "nope"}</div>
       <Count />
       {data?.map((row) => (
@@ -30,7 +31,6 @@ export function Table4({ className }: Props) {
       <pre>data: {JSONE.stringify(data, 2)}</pre>
 
       <Test />
-      <Test2 />
     </div>
   );
 }
@@ -41,7 +41,7 @@ function Test() {
   return <div>{JSONE.stringify(data, 2)}</div>;
 }
 function Test2() {
-  const [value, setValue] = useState("stu");
+  const [value, setValue] = useState("");
   const utils = idb.useUtils();
   const { data } = idb.table4.filter.useQuery((x) => x.hello.includes(value));
   useEffect(() => {
@@ -57,7 +57,7 @@ function Test2() {
         className="w-56"
         placeholder="add"
       />
-      {JSONE.stringify(data, 2)}
+      <pre>{JSONE.stringify(data, 2)}</pre>
     </div>
   );
 }
