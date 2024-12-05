@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { sleep } from "../../../utils/sleep";
-import { db } from "../../db/client";
+import { db, dbget, dbgetAll } from "../../db/client";
 import { Table4, zTable4, zTable4Content, zTable4Id } from "../../db/schema";
 import { publicProcedure, router } from "../trpc";
 
@@ -63,30 +63,11 @@ export const table4Router = router({
   }),
   getAll: publicProcedure.query(async () => {
     await sleep();
-
-    return new Promise<Table4[]>((resolve, reject) => {
-      const req = db()
-        .transaction(TABLE_NAME, "readonly")
-        .objectStore(TABLE_NAME)
-        .getAll();
-
-      req.onerror = () => reject();
-      req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
-    });
+    return await dbgetAll("table4");
   }),
   get: publicProcedure.input(zTable4Id).query(async ({ input }) => {
     await sleep();
-
-    return new Promise<Table4 | null>((resolve, reject) => {
-      const req = db()
-        .transaction(TABLE_NAME, "readonly")
-        .objectStore(TABLE_NAME)
-        .get(input.id);
-
-      req.onerror = () => reject();
-      req.onsuccess = (event) =>
-        resolve((event.target as IDBRequest).result ?? null);
-    });
+    return await dbget("table4", input.id);
   }),
   count: publicProcedure.query(async () => {
     await sleep();
