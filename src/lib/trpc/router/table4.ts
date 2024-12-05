@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { sleep } from "../../../utils/sleep";
 import { db } from "../../db/client";
 import { Table4, zTable4, zTable4Content, zTable4Id } from "../../db/schema";
@@ -5,7 +6,50 @@ import { publicProcedure, router } from "../trpc";
 
 const TABLE_NAME = "table4";
 
+async function iterateCursor<T>(cursor: IDBCursorWithValue) {
+  return new Promise<T[]>((resolve) => {
+    //const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
+    const rows: T[] = [];
+    if (cursor) {
+      // cursor.value contains the current record being iterated through
+      // this is where you'd do something with the result
+      rows.push(cursor.value);
+      cursor.continue();
+    } else {
+      // no more results
+      resolve(rows);
+    }
+  });
+}
+
 export const table4Router = router({
+  getAllWithCursor: publicProcedure.input(z.object({})).query(async () => {
+    await sleep();
+
+    return new Promise<Table4[]>((resolve, reject) => {
+      const req = db()
+        .transaction(TABLE_NAME, "readwrite")
+        .objectStore(TABLE_NAME)
+        .openCursor(null, "next");
+
+      //const rows = [];
+      req.onerror = () => reject();
+      req.onsuccess = (event) => {
+        const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
+
+        if (cursor) {
+          // cursor.value contains the current record being iterated through
+          // this is where you'd do something with the result
+          console.log("cursor.value:", cursor.value);
+          cursor.continue();
+        } else {
+          // no more results
+          //resolve((event.target as IDBRequest).result);
+          resolve([]);
+        }
+      };
+    });
+  }),
   getAll: publicProcedure.query(async () => {
     await sleep();
 

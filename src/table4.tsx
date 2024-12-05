@@ -28,8 +28,16 @@ export function Table4({ className }: Props) {
 
       <ButtonClear />
       <pre>data: {JSONE.stringify(data, 2)}</pre>
+
+      <Test />
     </div>
   );
+}
+
+function Test() {
+  const { data } = idb.table4.getAllWithCursor.useQuery({});
+
+  return <div>{JSONE.stringify(data, 2)}</div>;
 }
 
 function InputPut({ row }: { row: Table4Type }) {

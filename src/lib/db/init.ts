@@ -1,7 +1,7 @@
 import { db } from "./client";
 
 export async function initIndexedDB(
-  name = "MyTestDatabase6",
+  name = "MyTestDatabase1",
   version = 3
 ): Promise<void> {
   await new Promise<void>((resolve, reject) => {
