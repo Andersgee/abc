@@ -28,7 +28,7 @@ export function Table4({ className }: Props) {
       <InputAdd />
 
       <ButtonClear />
-      <pre>data: {JSONE.stringify(data, 2)}</pre>
+      <pre>getAll: {JSONE.stringify(data, 2)}</pre>
 
       <Test />
     </div>
@@ -38,7 +38,7 @@ export function Table4({ className }: Props) {
 function Test() {
   const { data } = idb.table4.getAllWithCursor.useQuery({});
 
-  return <div>{JSONE.stringify(data, 2)}</div>;
+  return <pre>getAllWithCursor: {JSONE.stringify(data, 2)}</pre>;
 }
 function Test2() {
   const [value, setValue] = useState("");
@@ -57,7 +57,7 @@ function Test2() {
         className="w-56"
         placeholder="add"
       />
-      <pre>{JSONE.stringify(data, 2)}</pre>
+      <pre>filter: {JSONE.stringify(data, 2)}</pre>
     </div>
   );
 }
