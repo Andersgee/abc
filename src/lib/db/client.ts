@@ -107,3 +107,30 @@ export function dbdelete<T extends keyof DB>(
     req.onsuccess = () => resolve();
   });
 }
+
+/** custom  */
+export function dbfilter<T extends keyof DB>(
+  tableName: T,
+  predicate: (value: DB[T]) => boolean
+) {
+  return new Promise<Array<DB[T]>>((resolve, reject) => {
+    const rows: Array<DB[T]> = [];
+
+    const req = read(tableName).openCursor();
+
+    req.onerror = () => reject();
+    req.onsuccess = (event) => {
+      const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
+
+      if (cursor) {
+        if (predicate(cursor.value)) {
+          rows.push(cursor.value);
+        }
+        cursor.continue();
+      } else {
+        // no more results
+        resolve(rows);
+      }
+    };
+  });
+}

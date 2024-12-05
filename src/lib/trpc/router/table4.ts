@@ -6,6 +6,7 @@ import {
   dbclear,
   dbcount,
   dbdelete,
+  dbfilter,
   dbget,
   dbgetAll,
   dbput,
@@ -21,30 +22,7 @@ const zPredicate = z.function().args(zTable4).returns(z.boolean());
 export const table4Router = router({
   filter: publicProcedure.input(zPredicate).query(async ({ input }) => {
     await sleep();
-
-    return new Promise((resolve, reject) => {
-      const rows: Table4[] = [];
-
-      const req = db()
-        .transaction(TABLE_NAME, "readonly")
-        .objectStore(TABLE_NAME)
-        .openCursor(null, "next");
-
-      req.onerror = () => reject();
-      req.onsuccess = (event) => {
-        const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
-
-        if (cursor) {
-          if (input(cursor.value)) {
-            rows.push(cursor.value);
-          }
-          cursor.continue();
-        } else {
-          // no more results
-          resolve(rows);
-        }
-      };
-    });
+    return await dbfilter("table4", input);
   }),
 
   getAllWithCursor: publicProcedure.input(z.object({})).query(async () => {
