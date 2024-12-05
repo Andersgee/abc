@@ -1,7 +1,7 @@
 import { cn } from "./utils/cn";
 import { JSONE } from "./utils/jsone";
 import { idb } from "./lib/trpc/hook";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import type { Table4 as Table4Type } from "./lib/db/schema";
 import { ButtonDanger } from "./components/button";
 import { Input } from "./components/input";
@@ -40,17 +40,20 @@ function Test() {
 
   return <pre>getAllWithCursor: {JSONE.stringify(data, 2)}</pre>;
 }
+
 function Test2() {
   const [value, setValue] = useState("");
-  const utils = idb.useUtils();
-  const { data } = idb.table4.filter.useQuery((x) => x.hello.includes(value));
-  useEffect(() => {
-    utils.table4.filter.refetch();
-  }, [value]);
+  const { data, isFetching } = idb.table4.filter.useQuery(
+    { value },
+    {
+      placeholderData: (x) => x, // aka keepPreviousData
+    }
+  );
 
   return (
     <div>
       <div>Sök</div>
+      {isFetching ? <div>laddar..</div> : null}
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}

@@ -17,13 +17,25 @@ import { publicProcedure, router } from "../trpc";
 //
 const TABLE_NAME = "table4";
 
-const zPredicate = z.function().args(zTable4).returns(z.boolean());
+//const zPredicate = z.function().args(zTable4).returns(z.boolean());
 
 export const table4Router = router({
-  filter: publicProcedure.input(zPredicate).query(async ({ input }) => {
-    await sleep();
-    return await dbfilter("table4", input);
-  }),
+  filter: publicProcedure
+    .input(z.object({ value: z.string() }))
+    .query(async ({ input }) => {
+      await sleep(3000);
+      return await dbfilter("table4", ({ hello }) =>
+        hello.includes(input.value)
+      );
+    }),
+
+  //this is a bit whack but since its all client side we can send the function itself to the route
+  filterWithFunction: publicProcedure
+    .input(z.function().args(zTable4).returns(z.boolean()))
+    .query(async ({ input }) => {
+      await sleep();
+      return await dbfilter("table4", input);
+    }),
 
   getAllWithCursor: publicProcedure.input(z.object({})).query(async () => {
     await sleep();

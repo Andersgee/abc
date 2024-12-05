@@ -16,6 +16,7 @@ const queryClient = new QueryClient({
       retryOnMount: true,
       throwOnError: false,
       retry: false,
+
       //retry: 3,
       //retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       //the default JSON.sringify will error on anything without .toJSON() method. like bigint or typed arrays etc
