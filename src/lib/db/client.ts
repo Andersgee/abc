@@ -107,7 +107,7 @@ export async function dbdelete<T extends keyof DB>(
     req.onsuccess = () => resolve();
   });
 }
-
+/*
 export async function dbopenCursor<T extends keyof DB>(
   tableName: T,
   query?: IDBValidKey | IDBKeyRange | null,
@@ -122,6 +122,7 @@ export async function dbopenCursor<T extends keyof DB>(
     };
   });
 }
+*/
 export async function dbopenCursorCallback<T extends keyof DB>(
   tableName: T,
   cb: (value: DB[T]) => void,
@@ -145,6 +146,7 @@ export async function dbopenCursorCallback<T extends keyof DB>(
   });
 }
 
+/** custom  */
 export async function dbfilter<T extends keyof DB>(
   tableName: T,
   predicate: (value: DB[T]) => boolean
@@ -156,31 +158,4 @@ export async function dbfilter<T extends keyof DB>(
     }
   });
   return rows;
-}
-
-/** custom  */
-export async function dbfilter_good<T extends keyof DB>(
-  tableName: T,
-  predicate: (value: DB[T]) => boolean
-) {
-  return new Promise<Array<DB[T]>>((resolve, reject) => {
-    const rows: Array<DB[T]> = [];
-
-    const req = read(tableName).openCursor();
-
-    req.onerror = () => reject();
-    req.onsuccess = (event) => {
-      const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
-
-      if (cursor) {
-        if (predicate(cursor.value)) {
-          rows.push(cursor.value);
-        }
-        cursor.continue();
-      } else {
-        // no more results
-        resolve(rows);
-      }
-    };
-  });
 }
