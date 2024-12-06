@@ -13,7 +13,7 @@ function write<T extends keyof DB>(tableName: T) {
   return db().transaction(tableName, "readwrite").objectStore(tableName);
 }
 
-export function dbget<T extends keyof DB>(
+export async function dbget<T extends keyof DB>(
   tableName: T,
   query: IDBValidKey | IDBKeyRange
 ) {
@@ -24,7 +24,7 @@ export function dbget<T extends keyof DB>(
   });
 }
 
-export function dbgetKey<T extends keyof DB>(
+export async function dbgetKey<T extends keyof DB>(
   tableName: T,
   query: IDBValidKey | IDBKeyRange
 ) {
@@ -35,7 +35,7 @@ export function dbgetKey<T extends keyof DB>(
   });
 }
 
-export function dbgetAll<T extends keyof DB>(
+export async function dbgetAll<T extends keyof DB>(
   tableName: T,
   query?: IDBValidKey | IDBKeyRange | null,
   count?: number
@@ -47,7 +47,7 @@ export function dbgetAll<T extends keyof DB>(
   });
 }
 
-export function dbgetAllKeys<T extends keyof DB>(
+export async function dbgetAllKeys<T extends keyof DB>(
   tableName: T,
   query?: IDBValidKey | IDBKeyRange | null,
   count?: number
@@ -59,7 +59,7 @@ export function dbgetAllKeys<T extends keyof DB>(
   });
 }
 
-export function dbcount<T extends keyof DB>(tableName: T) {
+export async function dbcount<T extends keyof DB>(tableName: T) {
   return new Promise<number>((resolve, reject) => {
     const req = read(tableName).count();
     req.onerror = () => reject();
@@ -67,7 +67,7 @@ export function dbcount<T extends keyof DB>(tableName: T) {
   });
 }
 
-export function dbadd<T extends keyof DB, V extends DB[T]>(
+export async function dbadd<T extends keyof DB, V extends DB[T]>(
   tableName: T,
   value: V
 ) {
@@ -78,7 +78,7 @@ export function dbadd<T extends keyof DB, V extends DB[T]>(
   });
 }
 
-export function dbclear<T extends keyof DB>(tableName: T) {
+export async function dbclear<T extends keyof DB>(tableName: T) {
   return new Promise<void>((resolve, reject) => {
     const req = write(tableName).clear();
     req.onerror = () => reject();
@@ -86,7 +86,7 @@ export function dbclear<T extends keyof DB>(tableName: T) {
   });
 }
 
-export function dbput<T extends keyof DB, V extends DB[T]>(
+export async function dbput<T extends keyof DB, V extends DB[T]>(
   tableName: T,
   value: V
 ) {
@@ -97,7 +97,7 @@ export function dbput<T extends keyof DB, V extends DB[T]>(
   });
 }
 
-export function dbdelete<T extends keyof DB>(
+export async function dbdelete<T extends keyof DB>(
   tableName: T,
   query: IDBValidKey | IDBKeyRange
 ) {
@@ -108,8 +108,58 @@ export function dbdelete<T extends keyof DB>(
   });
 }
 
+export async function dbopenCursor<T extends keyof DB>(
+  tableName: T,
+  query?: IDBValidKey | IDBKeyRange | null,
+  direction?: IDBCursorDirection
+) {
+  return new Promise<IDBCursorWithValue>((resolve, reject) => {
+    const req = read(tableName).openCursor(query, direction);
+    req.onerror = () => reject();
+    req.onsuccess = (event) => {
+      const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
+      resolve(cursor);
+    };
+  });
+}
+export async function dbopenCursorCallback<T extends keyof DB>(
+  tableName: T,
+  cb: (value: DB[T]) => void,
+  query?: IDBValidKey | IDBKeyRange | null,
+  direction?: IDBCursorDirection
+) {
+  return new Promise<void>((resolve, reject) => {
+    const req = read(tableName).openCursor(query, direction);
+    req.onerror = () => reject();
+    req.onsuccess = (event) => {
+      const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
+
+      if (cursor) {
+        cb(cursor.value);
+        cursor.continue();
+      } else {
+        // no more results
+        resolve();
+      }
+    };
+  });
+}
+
+export async function dbfilter<T extends keyof DB>(
+  tableName: T,
+  predicate: (value: DB[T]) => boolean
+) {
+  const rows: Array<DB[T]> = [];
+  await dbopenCursorCallback(tableName, (value) => {
+    if (predicate(value)) {
+      rows.push(value);
+    }
+  });
+  return rows;
+}
+
 /** custom  */
-export function dbfilter<T extends keyof DB>(
+export async function dbfilter_good<T extends keyof DB>(
   tableName: T,
   predicate: (value: DB[T]) => boolean
 ) {
