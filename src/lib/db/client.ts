@@ -150,7 +150,7 @@ type Query = IDBValidKey | { lower?: IDBValidKey; upper?: IDBValidKey };
 function keyRange(query?: Query) {
   if (query === undefined) return null; //all records
 
-  if ("lower" in query || "upper" in query) {
+  if (typeof query === "object" && ("lower" in query || "upper" in query)) {
     if (query.lower !== undefined && query.upper !== undefined) {
       return IDBKeyRange.bound(query.lower, query.upper);
     } else if (query.lower !== undefined) {
