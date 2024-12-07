@@ -28,7 +28,7 @@ export async function dbgetKey<T extends keyof DB>(
   tableName: T,
   query: IDBValidKey | IDBKeyRange
 ) {
-  return new Promise<DB[T]["id"] | null>((resolve, reject) => {
+  return new Promise<DB[T]["key"] | null>((resolve, reject) => {
     const req = read(tableName).getKey(query);
     req.onerror = () => reject();
     req.onsuccess = (e) => resolve((e.target as IDBRequest).result ?? null);
@@ -52,7 +52,7 @@ export async function dbgetAllKeys<T extends keyof DB>(
   query?: IDBValidKey | IDBKeyRange | null,
   count?: number
 ) {
-  return new Promise<Array<DB[T]["id"]>>((resolve, reject) => {
+  return new Promise<Array<DB[T]["key"]>>((resolve, reject) => {
     const req = read(tableName).getAllKeys(query, count);
     req.onerror = () => reject();
     req.onsuccess = (e) => resolve((e.target as IDBRequest).result);
@@ -71,7 +71,7 @@ export async function dbadd<T extends keyof DB, V extends DB[T]>(
   tableName: T,
   value: V
 ) {
-  return new Promise<DB[T]["id"]>((resolve, reject) => {
+  return new Promise<DB[T]["key"]>((resolve, reject) => {
     const req = write(tableName).add(value);
     req.onerror = () => reject();
     req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
@@ -90,7 +90,7 @@ export async function dbput<T extends keyof DB, V extends DB[T]>(
   tableName: T,
   value: V
 ) {
-  return new Promise<DB[T]["id"]>((resolve, reject) => {
+  return new Promise<DB[T]["key"]>((resolve, reject) => {
     const req = write(tableName).put(value);
     req.onerror = () => reject();
     req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
