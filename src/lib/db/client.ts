@@ -126,11 +126,11 @@ export async function dbopenCursor<T extends keyof DB>(
 export async function dbopenCursorCallback<T extends keyof DB>(
   tableName: T,
   cb: (value: DB[T]) => void,
-  query?: IDBValidKey | IDBKeyRange | null,
+  query?: Query,
   direction?: IDBCursorDirection
 ) {
   return new Promise<void>((resolve, reject) => {
-    const req = read(tableName).openCursor(query, direction);
+    const req = read(tableName).openCursor(keyRange(query), direction);
     req.onerror = () => reject();
     req.onsuccess = (event) => {
       const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
@@ -144,6 +144,25 @@ export async function dbopenCursorCallback<T extends keyof DB>(
       }
     };
   });
+}
+
+type Query = IDBValidKey | { lower?: IDBValidKey; upper?: IDBValidKey };
+function keyRange(query?: Query) {
+  if (query === undefined) return null; //all records
+
+  if (query.lower || query.upper) {
+    if (query.lower !== undefined && query.upper !== undefined) {
+      return IDBKeyRange.bound(query.lower, query.upper);
+    } else if (query.lower !== undefined) {
+      return IDBKeyRange.lowerBound(query.lower);
+    } else if (query.upper !== undefined) {
+      return IDBKeyRange.upperBound(query.upper);
+    } else {
+      return null;
+    }
+  } else {
+    return query as IDBValidKey;
+  }
 }
 
 /** custom  */
