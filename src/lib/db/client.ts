@@ -146,17 +146,30 @@ export async function dbopenCursorCallback<T extends keyof DB>(
   });
 }
 
-type Query = IDBValidKey | { lower?: IDBValidKey; upper?: IDBValidKey };
+type Query =
+  | IDBValidKey
+  | {
+      lower?: IDBValidKey;
+      upper?: IDBValidKey;
+      lowerOpen?: boolean;
+      upperOpen?: boolean;
+    };
+
 function keyRange(query?: Query) {
   if (query === undefined) return null; //all records
 
   if (typeof query === "object" && ("lower" in query || "upper" in query)) {
     if (query.lower !== undefined && query.upper !== undefined) {
-      return IDBKeyRange.bound(query.lower, query.upper);
+      return IDBKeyRange.bound(
+        query.lower,
+        query.upper,
+        query.lowerOpen,
+        query.upperOpen
+      );
     } else if (query.lower !== undefined) {
-      return IDBKeyRange.lowerBound(query.lower);
+      return IDBKeyRange.lowerBound(query.lower, query.lowerOpen);
     } else if (query.upper !== undefined) {
-      return IDBKeyRange.upperBound(query.upper);
+      return IDBKeyRange.upperBound(query.upper, query.upperOpen);
     } else {
       return null;
     }
