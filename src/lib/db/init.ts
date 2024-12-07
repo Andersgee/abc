@@ -30,7 +30,7 @@ function handlUpgradeNeeded(event: IDBVersionChangeEvent) {
 
   const table4 =
     createTable("table4", {
-      keyPath: "id",
+      keyPath: "key",
     }) ?? tx.objectStore("table4");
 
   const existingIndexNames = listFromDOMStringList(table4.indexNames);
