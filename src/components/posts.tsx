@@ -23,17 +23,17 @@ function List() {
 
   //const isSearching = isFetching && !isLoading; //fetching but not first time
   return (
-    <div>
+    <div className="space-y-2">
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         className="w-56"
-        placeholder="Sök"
+        placeholder="Search"
       />
 
-      <div>
+      <div className="space-y-2">
         {data?.map((post) => (
-          <div key={post.key} className="flex">
+          <div key={post.key} className="flex gap-2">
             <InputPut row={post} />
             <ButtonDelete id={post.key} />
           </div>
@@ -115,7 +115,5 @@ function ButtonDelete({ id }: { id: number }) {
     },
   });
 
-  return (
-    <ButtonDanger onClick={() => mutate({ key: id })}>delete</ButtonDanger>
-  );
+  return <ButtonDanger onClick={() => mutate({ key: id })}>X</ButtonDanger>;
 }

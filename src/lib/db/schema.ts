@@ -1,8 +1,10 @@
 import { z } from "zod";
+import { zodKeys } from "../../utils/zod-keys";
 
 export const zPost = z.object({
   key: z.number(),
   text: z.string(),
+  //comment: z.string(),
   //createdAt: z.date(),
   //updatedAt: z.date(),
 });
@@ -28,18 +30,36 @@ export function handlUpgradeNeeded(event: IDBVersionChangeEvent) {
   window.db = request.result;
 
   //todo handle migration aka upgrade properly
-  //const tx = request.transaction!; //this is needed to query for existing tables / indexes,
+  const tx = request.transaction!; //this is needed to query for existing tables / indexes,
+
+  /*
+  for (const [tableName, schema] of Object.entries(zDB.shape)) {
+    console.log("would create tableName:", tableName);
+
+    for (const colName of zodKeys(schema)) {
+      if (colName === "key") continue;
+      console.log("would create colName", colName);
+    }
+  }
+  */
 
   for (const [tableName, schema] of Object.entries(zDB.shape)) {
-    const table = createTable(tableName, {
-      keyPath: "key",
-      autoIncrement: true,
-    });
+    console.log("tableName:", tableName);
+
+    //create (or get already existing) table
+    const table =
+      createTable(tableName, { keyPath: "key", autoIncrement: true }) ??
+      tx.objectStore(tableName);
+
     if (!table) {
       console.warn("no table... :", tableName);
       continue;
     }
-    for (const colName of Object.keys(schema)) {
+    for (const colName of zodKeys(schema)) {
+      if (colName === "key") continue;
+      console.log("would create colName", colName);
+
+      //todo ignore if this exists?
       createColumn(table, colName, { multiEntry: false, unique: false });
     }
   }

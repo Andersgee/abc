@@ -1,9 +1,6 @@
 import { handlUpgradeNeeded } from "./schema";
 
-export async function initIndexedDB(
-  name = "poststuff",
-  version = 1
-): Promise<void> {
+export async function initIndexedDB(name = "post", version = 1): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const openDbRequest = indexedDB.open(name, version);
     openDbRequest.onerror = () => {
