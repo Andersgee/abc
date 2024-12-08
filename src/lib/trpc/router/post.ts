@@ -16,7 +16,7 @@ export const postRouter = router({
   update: publicProcedure
     .input(z.object({ key: z.number(), text: z.string() }))
     .mutation(async ({ input }) => {
-      return await idb.put("post", { key: input.key, text: input.text });
+      return await idb.update("post", { key: input.key, text: input.text });
     }),
   search: publicProcedure
     .input(z.object({ value: z.string() }))

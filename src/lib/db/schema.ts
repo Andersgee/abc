@@ -51,10 +51,6 @@ export function handlUpgradeNeeded(event: IDBVersionChangeEvent) {
       createTable(tableName, { keyPath: "key", autoIncrement: true }) ??
       tx.objectStore(tableName);
 
-    if (!table) {
-      console.warn("no table... :", tableName);
-      continue;
-    }
     for (const colName of zodKeys(schema)) {
       if (colName === "key") continue;
       console.log("would create colName", colName);

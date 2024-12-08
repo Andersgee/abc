@@ -93,6 +93,7 @@ export class Idb<DB extends Record<string, { key: IDBValidKey }>> {
     });
   }
 
+  /** note: behaviour of 'put' is equivalent to 'add' if theres no record with that key */
   put<T extends keyof DB & string, V extends DB[T]>(tableName: T, value: V) {
     return new Promise<DB[T]["key"]>((resolve, reject) => {
       const req = this.write(tableName).put(value);
@@ -115,6 +116,29 @@ export class Idb<DB extends Record<string, { key: IDBValidKey }>> {
   ///////////////
   // utilities //
   ///////////////
+
+  /** note: you cant update the value.key this way (or any way) */
+  update<T extends keyof DB & string, V extends DB[T]>(tableName: T, value: V) {
+    return new Promise<DB[T]["key"]>((resolve, reject) => {
+      const req = this.write(tableName).openCursor(value.key);
+      req.onerror = () => reject();
+      req.onsuccess = (event) => {
+        const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
+
+        if (cursor) {
+          if (cursor.key === value.key) {
+            //meh: this equals check doesnt work for Date or Array etc which are also allowed 'IDBValidKey'
+            cursor.update(value);
+          }
+          //cb(cursor.value);
+          cursor.continue();
+        } else {
+          // no more results
+          resolve(value.key);
+        }
+      };
+    });
+  }
 
   openCursorCallback<T extends keyof DB & string>(
     tableName: T,
