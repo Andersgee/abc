@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { TrpcProvider } from "./lib/trpc/provider";
 import { initIndexedDB } from "./lib/db/init";
 import { Posts } from "./components/posts";
+import { Table } from "./components/table";
 
 export default function App() {
   const isReady = useInitIndexedDb();
@@ -10,7 +11,10 @@ export default function App() {
 
   return (
     <TrpcProvider>
+      <Table />
+      {/* 
       <Posts />
+       */}
     </TrpcProvider>
   );
 }
