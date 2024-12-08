@@ -30,11 +30,23 @@ const entries: Entry[] = [
   },
 ];
 
-const Y = [0, 1, 2, 3];
+function indexArray(length: number) {
+  return Array.from({ length }, (_, i) => i);
+}
 
-const X = [0, 1, 2, 3];
+function getGridSize(entires: Entry[]): [number[], number[]] {
+  let x = 0;
+  let y = 0;
+  for (const entry of entires) {
+    x = Math.max(x, entry.x);
+    y = Math.max(y, entry.y);
+  }
+  return [indexArray(x + 1), indexArray(y + 1)];
+}
 
 export function Table() {
+  const [X, Y] = getGridSize(entries);
+
   return Y.map((y) => {
     return (
       <div key={y} className="flex gap-1">
