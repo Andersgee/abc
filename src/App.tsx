@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-
 import { TrpcProvider } from "./lib/trpc/provider";
 import { initIndexedDB } from "./lib/db/init";
-import { Table4 } from "./table4";
+import { Posts } from "./components/posts";
 
 export default function App() {
   const isReady = useInitIndexedDb();
@@ -11,7 +10,7 @@ export default function App() {
 
   return (
     <TrpcProvider>
-      <Table4 />
+      <Posts />
     </TrpcProvider>
   );
 }

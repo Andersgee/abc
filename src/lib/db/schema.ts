@@ -3,8 +3,8 @@ import { z } from "zod";
 export const zPost = z.object({
   key: z.number(),
   text: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  //createdAt: z.date(),
+  //updatedAt: z.date(),
 });
 
 export const zStuff = z.object({
@@ -31,7 +31,10 @@ export function handlUpgradeNeeded(event: IDBVersionChangeEvent) {
   //const tx = request.transaction!; //this is needed to query for existing tables / indexes,
 
   for (const [tableName, schema] of Object.entries(zDB.shape)) {
-    const table = createTable(tableName, { keyPath: "key" });
+    const table = createTable(tableName, {
+      keyPath: "key",
+      autoIncrement: true,
+    });
     if (!table) {
       console.warn("no table... :", tableName);
       continue;

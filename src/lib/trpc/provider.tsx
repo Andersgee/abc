@@ -1,5 +1,9 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { idb } from "./hook";
+import {
+  QueryClient,
+  QueryClientProvider,
+  keepPreviousData,
+} from "@tanstack/react-query";
+import { idbapi } from "./hook";
 //import { debugLink } from "./debug-link";
 import { routerCallerLink } from "./router-caller-link";
 
@@ -16,6 +20,8 @@ const queryClient = new QueryClient({
       retryOnMount: true,
       throwOnError: false,
       retry: false,
+      //placeholderData: (x) => x, // aka keepPreviousData
+      placeholderData: keepPreviousData,
 
       //retry: 3,
       //retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -25,15 +31,15 @@ const queryClient = new QueryClient({
   },
 });
 
-const trpcClient = idb.createClient({
+export const trpcClient = idbapi.createClient({
   //links: [debugLink, routerCallerLink()],
   links: [routerCallerLink()],
 });
 
 export function TrpcProvider({ children }: { children: React.ReactNode }) {
   return (
-    <idb.Provider client={trpcClient} queryClient={queryClient}>
+    <idbapi.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </idb.Provider>
+    </idbapi.Provider>
   );
 }
