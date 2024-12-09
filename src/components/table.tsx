@@ -51,7 +51,7 @@ function TableConent() {
   if (entries === undefined) return null;
   return Y.map((y) => {
     return (
-      <div key={y} className="flex border-b-2 border-black">
+      <div key={y} className="flex">
         {X.map((x) => {
           const cellEntrues = entries.filter(
             (cell) => cell.y === y && cell.x === x
@@ -72,7 +72,7 @@ function InputAdd({ x, y }: { x: number; y: number }) {
     onSuccess: () => utils.entry.invalidate(),
   });
   return (
-    <div className="flex">
+    <div className="flex p-2">
       <form
         onSubmit={(e) => {
           e.preventDefault();
