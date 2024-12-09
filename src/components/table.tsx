@@ -4,6 +4,7 @@ import { Input } from "./input";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { create } from "zustand";
+import { cn } from "../utils/cn";
 
 interface BearState {
   isEditing: boolean;
@@ -130,7 +131,15 @@ function InputUpdateLabel({ entry }: { entry: Entry }) {
         }
       }}
     >
-      <Input ref={ref} defaultValue={entry.label} className="" />
+      <Input
+        ref={ref}
+        defaultValue={entry.label}
+        className={cn(
+          entry.label.includes(" C") && "bg-red-500",
+          entry.label.includes(" B") && "bg-orange-400",
+          entry.label.includes(" A") && "bg-green-300"
+        )}
+      />
     </form>
   );
 }
@@ -157,7 +166,7 @@ function InputUpdateComment({ entry }: { entry: Entry }) {
         ref={ref}
         defaultValue={entry.comment}
         placeholder="comment"
-        className=""
+        className="bg-blue-100"
       />
     </form>
   );
@@ -198,8 +207,17 @@ function DisplayEntry({ entry }: { entry: Entry }) {
   }
 
   return (
-    <div className="flex p-2 bg-orange-200">
-      <div>{entry.label}</div>
+    <div className="flex p-2 items-center">
+      <div
+        className={cn(
+          "p-2",
+          entry.label.includes(" C") && "bg-red-500",
+          entry.label.includes(" B") && "bg-orange-400",
+          entry.label.includes(" A") && "bg-green-300"
+        )}
+      >
+        {entry.label}
+      </div>
       <div>{entry.comment ?? "no comment"}</div>
     </div>
   );
