@@ -11,7 +11,7 @@ interface BearState {
 }
 
 const useBearStore = create<BearState>()((set) => ({
-  isEditing: false,
+  isEditing: true,
   toggleIsEditing: () => set((prev) => ({ isEditing: !prev.isEditing })),
 }));
 
@@ -87,20 +87,20 @@ function InputAdd({ x, y }: { x: number; y: number }) {
           ref={ref}
           defaultValue=""
           className=""
-          placeholder="new"
+          placeholder="label"
         />
       </form>
-      <div className="w-10"></div>
     </div>
   );
 }
-function ButtonRemove({ id }: { id: number }) {
+function ButtonRemove({ id, className }: { id: number; className?: string }) {
   const utils = idbapi.useUtils();
   const { mutate } = idbapi.entry.remove.useMutation({
     onSuccess: () => utils.entry.invalidate(),
   });
   return (
     <button
+      className={className}
       onClick={() =>
         mutate({
           id,
@@ -112,18 +112,12 @@ function ButtonRemove({ id }: { id: number }) {
   );
 }
 
-function InputUpdate({ entry }: { entry: Entry }) {
+function InputUpdateLabel({ entry }: { entry: Entry }) {
   const ref = useRef<HTMLInputElement>(null);
 
   const utils = idbapi.useUtils();
   const { mutate: update } = idbapi.entry.update.useMutation({
-    onSuccess(data) {
-      utils.entry.invalidate();
-      console.log("put, onSuccess, data:", data);
-    },
-    onError(error) {
-      console.log("put, onError, error:", error);
-    },
+    onSuccess: () => utils.entry.invalidate(),
   });
 
   return (
@@ -141,6 +135,33 @@ function InputUpdate({ entry }: { entry: Entry }) {
   );
 }
 
+function InputUpdateComment({ entry }: { entry: Entry }) {
+  const ref = useRef<HTMLInputElement>(null);
+
+  const utils = idbapi.useUtils();
+  const { mutate: update } = idbapi.entry.update.useMutation({
+    onSuccess: () => utils.entry.invalidate(),
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const str = ref.current?.value;
+        if (str !== undefined) {
+          update({ id: entry.id, comment: str });
+        }
+      }}
+    >
+      <Input
+        ref={ref}
+        defaultValue={entry.comment}
+        placeholder="comment"
+        className=""
+      />
+    </form>
+  );
+}
 function DisplayEntries({
   x,
   y,
@@ -156,7 +177,7 @@ function DisplayEntries({
       {entries.map((entry) => (
         <DisplayEntry entry={entry} />
       ))}
-      {isEditing && <InputAdd x={x} y={y} />}
+      {entries.length < 1 && isEditing && <InputAdd x={x} y={y} />}
     </div>
   );
 }
@@ -166,9 +187,12 @@ function DisplayEntry({ entry }: { entry: Entry }) {
 
   if (isEditing) {
     return (
-      <div className="flex p-2">
-        <InputUpdate entry={entry} />
-        <ButtonRemove id={entry.id} />
+      <div className="flex p-2 relative">
+        <div className="flex flex-col">
+          <InputUpdateLabel entry={entry} />
+          <InputUpdateComment entry={entry} />
+        </div>
+        <ButtonRemove id={entry.id} className="absolute right-2 top-3.5" />
       </div>
     );
   }

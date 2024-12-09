@@ -29,14 +29,20 @@ export const entryRouter = router({
       return await idb.delete("entry", input.id);
     }),
   update: publicProcedure
-    .input(z.object({ id: z.number(), label: z.string() }))
+    .input(
+      z.object({
+        id: z.number(),
+        label: z.string().optional(),
+        comment: z.string().optional(),
+      })
+    )
     .mutation(async ({ input }) => {
-      return await idb.update("entry", { id: input.id, label: input.label });
+      return await idb.update("entry", input);
     }),
-  search: publicProcedure
-    .input(z.object({ value: z.string() }))
-    .query(async ({ input }) => {
-      //return await idb.filter("post", ({ text }) => text.includes(input.value));
-      return 1;
-    }),
+  //search: publicProcedure
+  //  .input(z.object({ value: z.string() }))
+  //  .query(async ({ input }) => {
+  //    //return await idb.filter("post", ({ text }) => text.includes(input.value));
+  //    return 1;
+  //  }),
 });
