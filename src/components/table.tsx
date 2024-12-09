@@ -1,41 +1,20 @@
 import { useRef } from "react";
 import { idbapi, RouterOutputs } from "../lib/trpc/hook";
 import { Input } from "./input";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
-/*
-type Entry = {
-  x: number;
-  y: number;
-  id: string;
-  label: string;
-  comment: string;
-};
+import { create } from "zustand";
 
-const entries: Entry[] = [
-  {
-    id: "a",
-    x: 0,
-    y: 0,
-    label: "cell1",
-    comment: "",
-  },
-  {
-    id: "b",
-    x: 1,
-    y: 0,
-    label: "cell2",
-    comment: "",
-  },
-  {
-    id: "c",
-    x: 1,
-    y: 1,
-    label: "cell4",
-    comment: "",
-  },
-];
-*/
+interface BearState {
+  isEditing: boolean;
+  toggleIsEditing: () => void;
+}
+
+const useBearStore = create<BearState>()((set) => ({
+  isEditing: false,
+  toggleIsEditing: () => set((prev) => ({ isEditing: !prev.isEditing })),
+}));
+
 function indexArray(length: number) {
   return Array.from({ length }, (_, i) => i);
 }
@@ -54,6 +33,18 @@ function getGridSize(entires: Entry[]): [number[], number[]] {
 }
 
 export function Table() {
+  const toggleIsEditing = useBearStore((s) => s.toggleIsEditing);
+  return (
+    <div>
+      <button onClick={toggleIsEditing}>
+        <Pencil />
+      </button>
+      <TableConent />
+    </div>
+  );
+}
+
+function TableConent() {
   const { data: entries } = idbapi.entry.list.useQuery();
   const [X, Y] = getGridSize(entries ?? []);
 
@@ -62,43 +53,11 @@ export function Table() {
     return (
       <div key={y} className="flex border-b-2 border-black">
         {X.map((x) => {
-          const cell = entries.filter((cell) => cell.y === y && cell.x === x);
+          const cellEntrues = entries.filter(
+            (cell) => cell.y === y && cell.x === x
+          );
 
-          if (cell.length === 0) {
-            return (
-              <div key={`${x}-${y}`} className="p-2 bg-yellow-500">
-                <div className="flex">
-                  <InputAdd x={x} y={y} />
-                </div>
-              </div>
-            );
-          } else if (cell.length === 1) {
-            const entry = cell[0]!;
-            return (
-              <div key={entry.id} className="p-2 bg-orange-500">
-                <div className="flex">
-                  <InputUpdate {...entry} />
-                  <ButtonRemove id={entry.id} />
-                </div>
-                <InputAdd x={x} y={y} />
-              </div>
-            );
-          } else {
-            return (
-              <div
-                key={`${y}-${x}-${cell.length}`}
-                className="flex flex-col bg-purple-300 p-2"
-              >
-                {cell.map((entry) => (
-                  <div key={entry.id} className="flex">
-                    <InputUpdate {...entry} />
-                    <ButtonRemove id={entry.id} />
-                  </div>
-                ))}
-                <InputAdd x={x} y={y} />
-              </div>
-            );
-          }
+          return <DisplayEntries entries={cellEntrues} x={x} y={y} />;
         })}
       </div>
     );
@@ -153,7 +112,7 @@ function ButtonRemove({ id }: { id: number }) {
   );
 }
 
-function InputUpdate(entry: Entry) {
+function InputUpdate({ entry }: { entry: Entry }) {
   const ref = useRef<HTMLInputElement>(null);
 
   const utils = idbapi.useUtils();
@@ -179,5 +138,44 @@ function InputUpdate(entry: Entry) {
     >
       <Input ref={ref} defaultValue={entry.label} className="" />
     </form>
+  );
+}
+
+function DisplayEntries({
+  x,
+  y,
+  entries,
+}: {
+  x: number;
+  y: number;
+  entries: Entry[];
+}) {
+  const isEditing = useBearStore((s) => s.isEditing);
+  return (
+    <div className="flex flex-col bg-blue-300">
+      {entries.map((entry) => (
+        <DisplayEntry entry={entry} />
+      ))}
+      {isEditing && <InputAdd x={x} y={y} />}
+    </div>
+  );
+}
+
+function DisplayEntry({ entry }: { entry: Entry }) {
+  const isEditing = useBearStore((s) => s.isEditing);
+
+  if (isEditing) {
+    return (
+      <div className="flex p-2">
+        <InputUpdate entry={entry} />
+        <ButtonRemove id={entry.id} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex p-2 bg-orange-200">
+      <div>{entry.label}</div>
+    </div>
   );
 }
