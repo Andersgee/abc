@@ -60,7 +60,7 @@ export function Table() {
   if (entries === undefined) return null;
   return Y.map((y) => {
     return (
-      <div key={y} className="flex gap-1">
+      <div key={y} className="flex border-b-2 border-black">
         {X.map((x) => {
           const cell = entries.filter((cell) => cell.y === y && cell.x === x);
 
