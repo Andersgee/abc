@@ -5,7 +5,7 @@ export function db() {
   return window.db;
 }
 
-export class Idb<DB extends Record<string, { key: IDBValidKey }>> {
+export class Idb<DB extends Record<string, { id: IDBValidKey }>> {
   constructor() {
     //init
   }
@@ -34,7 +34,7 @@ export class Idb<DB extends Record<string, { key: IDBValidKey }>> {
     tableName: T,
     query: IDBValidKey | IDBKeyRange
   ) {
-    return new Promise<DB[T]["key"] | null>((resolve, reject) => {
+    return new Promise<DB[T]["id"] | null>((resolve, reject) => {
       const req = this.read(tableName).getKey(query);
       req.onerror = () => reject();
       req.onsuccess = (e) => resolve((e.target as IDBRequest).result ?? null);
@@ -58,7 +58,7 @@ export class Idb<DB extends Record<string, { key: IDBValidKey }>> {
     query?: IDBValidKey | IDBKeyRange | null,
     count?: number
   ) {
-    return new Promise<Array<DB[T]["key"]>>((resolve, reject) => {
+    return new Promise<Array<DB[T]["id"]>>((resolve, reject) => {
       const req = this.read(tableName).getAllKeys(query, count);
       req.onerror = () => reject();
       req.onsuccess = (e) => resolve((e.target as IDBRequest).result);
@@ -76,9 +76,9 @@ export class Idb<DB extends Record<string, { key: IDBValidKey }>> {
   //omit key assuming autoincrement.
   add<T extends keyof DB & string, V extends DB[T]>(
     tableName: T,
-    value: Omit<V, "key">
+    value: Omit<V, "id">
   ) {
-    return new Promise<DB[T]["key"]>((resolve, reject) => {
+    return new Promise<DB[T]["id"]>((resolve, reject) => {
       const req = this.write(tableName).add(value);
       req.onerror = () => reject();
       req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
@@ -95,7 +95,7 @@ export class Idb<DB extends Record<string, { key: IDBValidKey }>> {
 
   /** note: behaviour of 'put' is equivalent to 'add' if theres no record with that key */
   put<T extends keyof DB & string, V extends DB[T]>(tableName: T, value: V) {
-    return new Promise<DB[T]["key"]>((resolve, reject) => {
+    return new Promise<DB[T]["id"]>((resolve, reject) => {
       const req = this.write(tableName).put(value);
       req.onerror = () => reject();
       req.onsuccess = (event) => resolve((event.target as IDBRequest).result);
@@ -118,23 +118,26 @@ export class Idb<DB extends Record<string, { key: IDBValidKey }>> {
   ///////////////
 
   /** note: you cant update the value.key this way (or any way) */
-  update<T extends keyof DB & string, V extends DB[T]>(tableName: T, value: V) {
-    return new Promise<DB[T]["key"]>((resolve, reject) => {
-      const req = this.write(tableName).openCursor(value.key);
+  update<T extends keyof DB & string, V extends DB[T]>(
+    tableName: T,
+    value: Partial<V> & { id: DB[T]["id"] }
+  ) {
+    return new Promise<DB[T]["id"]>((resolve, reject) => {
+      const req = this.write(tableName).openCursor(value.id);
       req.onerror = () => reject();
       req.onsuccess = (event) => {
         const cursor: IDBCursorWithValue = (event.target as IDBRequest).result;
 
         if (cursor) {
-          if (cursor.key === value.key) {
+          if (cursor.key === value.id) {
             //meh: this equals check doesnt work for Date or Array etc which are also allowed 'IDBValidKey'
-            cursor.update(value);
+            cursor.update({ ...cursor.value, ...value });
           }
           //cb(cursor.value);
           cursor.continue();
         } else {
           // no more results
-          resolve(value.key);
+          resolve(value.id);
         }
       };
     });

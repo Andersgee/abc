@@ -1,8 +1,8 @@
 import { router } from "../trpc";
-import { postRouter } from "./post";
+import { entryRouter } from "./entry";
 
 export const idbRouter = router({
-  post: postRouter,
+  entry: entryRouter,
 });
 
 export type IdbRouter = typeof idbRouter;

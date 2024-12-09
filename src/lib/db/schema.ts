@@ -1,29 +1,20 @@
 import { z } from "zod";
 import { zodKeys } from "../../utils/zod-keys";
 
-export const zPost = z.object({
-  key: z.number(),
-  text: z.string(),
-  //comment: z.string(),
-  //createdAt: z.date(),
-  //updatedAt: z.date(),
+export const zEntry = z.object({
+  id: z.number(),
+  x: z.number(),
+  y: z.number(),
+  label: z.string(),
+  comment: z.string(),
 });
-
-export const zStuff = z.object({
-  key: z.number(),
-  hello: z.string(),
-});
+//export type Entry = z.infer<typeof zEntry>;
 
 export const zDB = z.object({
-  post: zPost,
-  stuff: zStuff,
+  entry: zEntry,
 });
 
 export type DB = z.infer<typeof zDB>;
-
-//for (const [tableName,schema] of Object.entries(zDB.shape)) {
-//
-//}
 
 export function handlUpgradeNeeded(event: IDBVersionChangeEvent) {
   const request = event.target as IDBOpenDBRequest;
@@ -48,11 +39,11 @@ export function handlUpgradeNeeded(event: IDBVersionChangeEvent) {
 
     //create (or get already existing) table
     const table =
-      createTable(tableName, { keyPath: "key", autoIncrement: true }) ??
+      createTable(tableName, { keyPath: "id", autoIncrement: true }) ??
       tx.objectStore(tableName);
 
     for (const colName of zodKeys(schema)) {
-      if (colName === "key") continue;
+      if (colName === "id") continue;
       console.log("would create colName", colName);
 
       //todo ignore if this exists?
