@@ -64,12 +64,13 @@ export function Table() {
           const cell = entries.filter((cell) => cell.y === y && cell.x === x);
 
           if (cell.length === 0) {
-            return <ButtonAdd key={`${x}-${y}`} x={x} y={y} />;
+            return <InputAdd key={`${x}-${y}`} x={x} y={y} />;
           } else if (cell.length === 1) {
             const entry = cell[0]!;
             return (
               <div key={entry.id}>
                 <InputPut {...entry} />
+                <ButtonRemove id={entry.id} />
               </div>
             );
           } else {
@@ -87,23 +88,41 @@ export function Table() {
   });
 }
 
-function ButtonAdd({ x, y }: { x: number; y: number }) {
+function InputAdd({ x, y }: { x: number; y: number }) {
+  const ref = useRef<HTMLInputElement>(null);
+
   const utils = idbapi.useUtils();
   const { mutate: create } = idbapi.entry.create.useMutation({
     onSuccess: () => utils.entry.invalidate(),
   });
   return (
-    <button
-      onClick={() => {
-        create({
-          x,
-          y,
-          comment: "",
-          label: "",
-        });
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const str = ref.current?.value;
+        if (str !== undefined) {
+          create({ x, y, label: str, comment: "" });
+        }
       }}
     >
-      +
+      <Input ref={ref} defaultValue="" className="w-56" placeholder="label" />
+    </form>
+  );
+}
+function ButtonRemove({ id }: { id: number }) {
+  const utils = idbapi.useUtils();
+  const { mutate } = idbapi.entry.remove.useMutation({
+    onSuccess: () => utils.entry.invalidate(),
+  });
+  return (
+    <button
+      onClick={() =>
+        mutate({
+          id,
+        })
+      }
+    >
+      x
     </button>
   );
 }
@@ -112,7 +131,7 @@ function InputPut(entry: Entry) {
   const ref = useRef<HTMLInputElement>(null);
 
   const utils = idbapi.useUtils();
-  const { mutate } = idbapi.entry.update.useMutation({
+  const { mutate: update } = idbapi.entry.update.useMutation({
     onSuccess(data) {
       utils.entry.invalidate();
       console.log("put, onSuccess, data:", data);
@@ -128,7 +147,7 @@ function InputPut(entry: Entry) {
         e.preventDefault();
         const str = ref.current?.value;
         if (str !== undefined) {
-          mutate({ id: entry.id, label: str });
+          update({ id: entry.id, label: str });
         }
       }}
     >

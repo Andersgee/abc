@@ -24,16 +24,14 @@ export const entryRouter = router({
       });
     }),
   remove: publicProcedure
-    .input(z.object({ key: z.number() }))
+    .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
-      //return await idb.delete("post", input.key);
-      return 1;
+      return await idb.delete("entry", input.id);
     }),
   update: publicProcedure
     .input(z.object({ id: z.number(), label: z.string() }))
     .mutation(async ({ input }) => {
       return await idb.update("entry", { id: input.id, label: input.label });
-      //return 1;
     }),
   search: publicProcedure
     .input(z.object({ value: z.string() }))
