@@ -1,19 +1,23 @@
 import { useRef } from "react";
 import { idbapi, RouterOutputs } from "../lib/trpc/hook";
 import { Input } from "./input";
-import { Pencil, Trash2 } from "lucide-react";
+import { ChartBarIcon, Pencil, Trash2 } from "lucide-react";
 
 import { create } from "zustand";
 import { cn } from "../utils/cn";
 
 interface BearState {
   isEditing: boolean;
+  showComments: boolean;
   toggleIsEditing: () => void;
+  toggleComments: () => void;
 }
 
 const useBearStore = create<BearState>()((set) => ({
   isEditing: true,
+  showComments: false,
   toggleIsEditing: () => set((prev) => ({ isEditing: !prev.isEditing })),
+  toggleComments: () => set((prev) => ({ showComments: !prev.showComments })),
 }));
 
 function indexArray(length: number) {
@@ -35,10 +39,14 @@ function getGridSize(entires: Entry[]): [number[], number[]] {
 
 export function Table() {
   const toggleIsEditing = useBearStore((s) => s.toggleIsEditing);
+  const toggleComments = useBearStore((s) => s.toggleComments);
   return (
     <div>
       <button onClick={toggleIsEditing}>
         <Pencil />
+      </button>
+      <button onClick={toggleComments}>
+        <ChartBarIcon />
       </button>
       <TableConent />
     </div>
@@ -193,13 +201,15 @@ function DisplayEntries({
 
 function DisplayEntry({ entry }: { entry: Entry }) {
   const isEditing = useBearStore((s) => s.isEditing);
+  const showComments = useBearStore((s) => s.showComments);
 
   if (isEditing) {
     return (
       <div className="flex p-2 relative">
         <div className="flex flex-col">
           <InputUpdateLabel entry={entry} />
-          <InputUpdateComment entry={entry} />
+
+          {showComments && <InputUpdateComment entry={entry} />}
         </div>
         <ButtonRemove id={entry.id} className="absolute right-2 top-3.5" />
       </div>
