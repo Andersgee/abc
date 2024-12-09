@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { idbapi, RouterOutputs } from "../lib/trpc/hook";
 import { Input } from "./input";
+import { Trash2 } from "lucide-react";
 
 /*
 type Entry = {
@@ -49,7 +50,7 @@ function getGridSize(entires: Entry[]): [number[], number[]] {
     x = Math.max(x, entry.x);
     y = Math.max(y, entry.y);
   }
-  return [indexArray(x + 1), indexArray(y + 1)];
+  return [indexArray(x + 2), indexArray(y + 2)];
 }
 
 export function Table() {
@@ -59,26 +60,42 @@ export function Table() {
   if (entries === undefined) return null;
   return Y.map((y) => {
     return (
-      <div key={y} className="flex gap-1 h-20 bg-red-200">
+      <div key={y} className="flex gap-1">
         {X.map((x) => {
           const cell = entries.filter((cell) => cell.y === y && cell.x === x);
 
           if (cell.length === 0) {
-            return <InputAdd key={`${x}-${y}`} x={x} y={y} />;
+            return (
+              <div key={`${x}-${y}`} className="p-2 bg-yellow-500">
+                <div className="flex">
+                  <InputAdd x={x} y={y} />
+                </div>
+              </div>
+            );
           } else if (cell.length === 1) {
             const entry = cell[0]!;
             return (
-              <div key={entry.id}>
-                <InputPut {...entry} />
-                <ButtonRemove id={entry.id} />
+              <div key={entry.id} className="p-2 bg-orange-500">
+                <div className="flex">
+                  <InputUpdate {...entry} />
+                  <ButtonRemove id={entry.id} />
+                </div>
+                <InputAdd x={x} y={y} />
               </div>
             );
           } else {
             return (
-              <div key={`${y}-${x}`} className="h-4 w-10 m-1 ">
-                {cell.map((entry) => {
-                  return <div key={entry.id}>{entry.label}</div>;
-                })}
+              <div
+                key={`${y}-${x}-${cell.length}`}
+                className="flex flex-col bg-purple-300 p-2"
+              >
+                {cell.map((entry) => (
+                  <div key={entry.id} className="flex">
+                    <InputUpdate {...entry} />
+                    <ButtonRemove id={entry.id} />
+                  </div>
+                ))}
+                <InputAdd x={x} y={y} />
               </div>
             );
           }
@@ -96,17 +113,26 @@ function InputAdd({ x, y }: { x: number; y: number }) {
     onSuccess: () => utils.entry.invalidate(),
   });
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        const str = ref.current?.value;
-        if (str !== undefined) {
-          create({ x, y, label: str, comment: "" });
-        }
-      }}
-    >
-      <Input ref={ref} defaultValue="" className="w-56" placeholder="label" />
-    </form>
+    <div className="flex">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const str = ref.current?.value;
+          if (str) {
+            create({ x, y, label: str, comment: "" });
+          }
+        }}
+      >
+        <Input
+          autoFocus={true}
+          ref={ref}
+          defaultValue=""
+          className=""
+          placeholder="new"
+        />
+      </form>
+      <div className="w-10"></div>
+    </div>
   );
 }
 function ButtonRemove({ id }: { id: number }) {
@@ -122,12 +148,12 @@ function ButtonRemove({ id }: { id: number }) {
         })
       }
     >
-      x
+      <Trash2 className="w-8" />
     </button>
   );
 }
 
-function InputPut(entry: Entry) {
+function InputUpdate(entry: Entry) {
   const ref = useRef<HTMLInputElement>(null);
 
   const utils = idbapi.useUtils();
@@ -151,7 +177,7 @@ function InputPut(entry: Entry) {
         }
       }}
     >
-      <Input ref={ref} defaultValue={entry.label} className="w-56" />
+      <Input ref={ref} defaultValue={entry.label} className="" />
     </form>
   );
 }
