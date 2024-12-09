@@ -176,6 +176,7 @@ function DisplayEntry({ entry }: { entry: Entry }) {
   return (
     <div className="flex p-2 bg-orange-200">
       <div>{entry.label}</div>
+      <div>{entry.comment ?? "no comment"}</div>
     </div>
   );
 }
