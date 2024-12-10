@@ -130,7 +130,7 @@ function InputAdd({ x, y }: { x: number; y: Date }) {
         }}
       >
         <Input
-          autoFocus={true}
+          //autoFocus={true}
           ref={ref}
           defaultValue=""
           className=""
