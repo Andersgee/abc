@@ -5,6 +5,11 @@ import { ChartBarIcon, Pencil, Trash2 } from "lucide-react";
 
 import { create } from "zustand";
 import { cn } from "../utils/cn";
+import { format, addDays } from "date-fns";
+
+function dateformat(date: Date) {
+  return format(date, "yyyy-MM-dd");
+}
 
 interface BearState {
   isEditing: boolean;
@@ -57,10 +62,14 @@ function TableConent() {
   const { data: entries } = idbapi.entry.list.useQuery();
   const [X, Y] = getGridSize(entries ?? []);
 
+  const d = new Date();
   if (entries === undefined) return null;
+
   return Y.map((y) => {
     return (
-      <div key={y} className="flex">
+      <div key={y} className="flex items-center">
+        <div>{dateformat(addDays(d, y))}</div>
+
         {X.map((x) => {
           const cellEntrues = entries.filter(
             (cell) => cell.y === y && cell.x === x
@@ -96,7 +105,7 @@ function InputAdd({ x, y }: { x: number; y: number }) {
           ref={ref}
           defaultValue=""
           className=""
-          placeholder="label"
+          placeholder=""
         />
       </form>
     </div>
@@ -174,7 +183,7 @@ function InputUpdateComment({ entry }: { entry: Entry }) {
         ref={ref}
         defaultValue={entry.comment}
         placeholder="comment"
-        className="bg-blue-100"
+        className="bg-neutral-50"
       />
     </form>
   );
@@ -190,7 +199,7 @@ function DisplayEntries({
 }) {
   const isEditing = useBearStore((s) => s.isEditing);
   return (
-    <div className="flex flex-col bg-blue-300">
+    <div className="flex flex-col ">
       {entries.map((entry) => (
         <DisplayEntry entry={entry} />
       ))}
