@@ -6,11 +6,20 @@ export const entryRouter = router({
   list: publicProcedure.query(async () => {
     return await idb.getAll("entry");
   }),
+  listBetweenDates: publicProcedure
+    .input(z.object({ from: z.date(), to: z.date() }))
+    .query(async ({ input }) => {
+      const x = await idb.filter(
+        "entry",
+        (entry) => entry.y >= input.from && entry.y <= input.to
+      );
+      return x;
+    }),
   create: publicProcedure
     .input(
       z.object({
         x: z.number(),
-        y: z.number(),
+        y: z.date(),
         label: z.string(),
         comment: z.string(),
       })

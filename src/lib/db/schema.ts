@@ -4,7 +4,7 @@ import { zodKeys } from "../../utils/zod-keys";
 export const zEntry = z.object({
   id: z.number(),
   x: z.number(),
-  y: z.number(),
+  y: z.date(),
   label: z.string(),
   comment: z.string(),
 });
