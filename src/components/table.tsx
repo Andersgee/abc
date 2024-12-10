@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { idbapi, RouterOutputs } from "../lib/trpc/hook";
 import { Input } from "./input";
-import { ChartBarIcon, Pencil, Trash2 } from "lucide-react";
+import { ChartBarIcon, Check, Pencil, Trash2 } from "lucide-react";
 
 import { create } from "zustand";
 import { cn } from "../utils/cn";
@@ -125,7 +125,7 @@ function InputAdd({ x, y }: { x: number; y: Date }) {
           e.preventDefault();
           const str = ref.current?.value;
           if (str) {
-            create({ x, y, label: str, comment: "" });
+            create({ x, y, label: str });
           }
         }}
       >
@@ -156,6 +156,32 @@ function ButtonRemove({ id, className }: { id: number; className?: string }) {
     >
       <Trash2 className="w-8" />
     </button>
+  );
+}
+
+function CheckUpdateCompleted({ entry }: { entry: Entry }) {
+  const utils = idbapi.useUtils();
+  const { mutate: update } = idbapi.entry.update.useMutation({
+    onSuccess: () => utils.entry.invalidate(),
+  });
+
+  return (
+    <label>
+      <input
+        className="hidden"
+        type="checkbox"
+        checked={entry.completed}
+        onChange={(e) => {
+          update({ id: entry.id, completed: e.target.checked });
+        }}
+      />
+      <Check
+        strokeWidth={2.75}
+        aria-checked={entry.completed ? "true" : undefined}
+        className="aria-checked:bg-green-500 aria-checked:border-green-700 rounded-full 
+        aria-checked:text-black hover:cursor-pointer border border-neutral-500 text-neutral-500"
+      />
+    </label>
   );
 }
 
@@ -245,7 +271,10 @@ function DisplayEntry({ entry }: { entry: Entry }) {
     return (
       <div className="flex p-2 relative">
         <div className="flex flex-col">
-          <InputUpdateLabel entry={entry} />
+          <div className="flex items-center">
+            <CheckUpdateCompleted entry={entry} />
+            <InputUpdateLabel entry={entry} />
+          </div>
 
           {showComments && <InputUpdateComment entry={entry} />}
         </div>
@@ -258,15 +287,17 @@ function DisplayEntry({ entry }: { entry: Entry }) {
     <div className="flex p-2 items-center">
       <div
         className={cn(
-          "p-2",
+          "p-2 flex items-center",
           entry.label.includes(" C") && "bg-red-500",
           entry.label.includes(" B") && "bg-orange-400",
           entry.label.includes(" A") && "bg-green-300"
         )}
       >
+        <CheckUpdateCompleted entry={entry} />
         {entry.label}
       </div>
-      <div>{entry.comment ?? "no comment"}</div>
+
+      <div>{entry.comment}</div>
     </div>
   );
 }

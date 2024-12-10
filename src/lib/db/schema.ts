@@ -7,6 +7,7 @@ export const zEntry = z.object({
   y: z.date(),
   label: z.string(),
   comment: z.string(),
+  completed: z.boolean(),
 });
 //export type Entry = z.infer<typeof zEntry>;
 

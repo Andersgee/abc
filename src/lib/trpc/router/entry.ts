@@ -21,15 +21,15 @@ export const entryRouter = router({
         x: z.number(),
         y: z.date(),
         label: z.string(),
-        comment: z.string(),
       })
     )
     .mutation(async ({ input }) => {
       return await idb.add("entry", {
         x: input.x,
         y: input.y,
-        comment: input.comment,
         label: input.label,
+        comment: "",
+        completed: false,
       });
     }),
   remove: publicProcedure
@@ -43,6 +43,7 @@ export const entryRouter = router({
         id: z.number(),
         label: z.string().optional(),
         comment: z.string().optional(),
+        completed: z.boolean().optional(),
       })
     )
     .mutation(async ({ input }) => {
