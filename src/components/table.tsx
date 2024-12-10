@@ -51,6 +51,15 @@ function getGridSize(entires: Entry[]): [number[], number[]] {
 }
 */
 
+function getX(entires: Entry[]): number[] {
+  let x = 0;
+
+  for (const entry of entires) {
+    x = Math.max(x, entry.x);
+  }
+  return indexArray(x + 2);
+}
+
 export function Table() {
   const toggleIsEditing = useBearStore((s) => s.toggleIsEditing);
   const toggleComments = useBearStore((s) => s.toggleComments);
@@ -70,13 +79,13 @@ export function Table() {
 function TableConent() {
   const d = startOfDay(new Date());
   const from = subDays(d, 7);
-  const to = addDays(d, 7);
+  const to = addDays(d, 14);
   const { data: entries } = idbapi.entry.listBetweenDates.useQuery({
     from,
     to,
   });
   //const [X, Y] = getGridSize(entries ?? []);
-  const X = indexArray(3);
+  const X = getX(entries ?? []);
   const Y = indexArray(14);
 
   if (entries === undefined) return null;
