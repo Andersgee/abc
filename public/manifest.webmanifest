@@ -1,0 +1,17 @@
+{
+  "name": "ABC",
+  "short_name": "ABC",
+  "description": "Strength training like the russians.",
+  "display": "standalone",
+  "orientation": "any",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
