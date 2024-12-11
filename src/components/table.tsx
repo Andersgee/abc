@@ -72,8 +72,8 @@ export function Table() {
     });
 
   return (
-    <>
-      <div className="flex  gap-2">
+    <div className="">
+      <div className="flex gap-2 sticky top-0 bg-white/80">
         <button onClick={() => toggleIsEditing()}>
           <Pencil className="size-10" />
         </button>
@@ -82,7 +82,7 @@ export function Table() {
         </button>
       </div>
       <TableConent />
-    </>
+    </div>
   );
 }
 
