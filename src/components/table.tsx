@@ -3,7 +3,7 @@ import { idbapi, RouterOutputs } from "../lib/trpc/hook";
 import { Input } from "./input";
 import { ChartBarIcon, Check, Pencil, Trash2 } from "lucide-react";
 
-import { create } from "zustand";
+//import { create } from "zustand";
 import { cn } from "../utils/cn";
 import {
   format,
@@ -18,20 +18,20 @@ function dateformat(date: Date) {
   return format(date, "yyyy-MM-dd");
 }
 
+/*
 interface BearState {
   isEditing: boolean;
   showComments: boolean;
   toggleIsEditing: () => void;
   toggleComments: () => void;
 }
-
 const useBearStore = create<BearState>()((set) => ({
   isEditing: true,
   showComments: false,
   toggleIsEditing: () => set((prev) => ({ isEditing: !prev.isEditing })),
   toggleComments: () => set((prev) => ({ showComments: !prev.showComments })),
 }));
-
+*/
 function indexArray(length: number) {
   return Array.from({ length }, (_, i) => i);
 }
@@ -61,18 +61,28 @@ function getX(entires: Entry[]): number[] {
 }
 
 export function Table() {
-  const toggleIsEditing = useBearStore((s) => s.toggleIsEditing);
-  const toggleComments = useBearStore((s) => s.toggleComments);
+  const utils = idbapi.useUtils();
+  const { mutate: toggleIsEditing } =
+    idbapi.settings.toggleIsEditing.useMutation({
+      onSuccess: () => utils.settings.invalidate(),
+    });
+  const { mutate: toggleShowComments } =
+    idbapi.settings.toggleShowComments.useMutation({
+      onSuccess: () => utils.settings.invalidate(),
+    });
+
   return (
-    <div>
-      <button onClick={toggleIsEditing}>
-        <Pencil />
-      </button>
-      <button onClick={toggleComments}>
-        <ChartBarIcon />
-      </button>
+    <>
+      <div className="flex  gap-2">
+        <button onClick={() => toggleIsEditing()}>
+          <Pencil className="size-10" />
+        </button>
+        <button onClick={() => toggleShowComments()}>
+          <ChartBarIcon className="size-10" />
+        </button>
+      </div>
       <TableConent />
-    </div>
+    </>
   );
 }
 
@@ -104,7 +114,14 @@ function TableConent() {
             (cell) => cell.x === x && isSameDay(cell.y, rowDate)
           );
 
-          return <DisplayEntries entries={cellEntries} x={x} y={rowDate} />;
+          return (
+            <DisplayEntries
+              key={`${y}-${x}`}
+              entries={cellEntries}
+              x={x}
+              y={rowDate}
+            />
+          );
         })}
       </div>
     );
@@ -252,22 +269,22 @@ function DisplayEntries({
   y: Date;
   entries: Entry[];
 }) {
-  const isEditing = useBearStore((s) => s.isEditing);
+  const { data } = idbapi.settings.get.useQuery();
+
   return (
     <div className="flex flex-col ">
       {entries.map((entry) => (
-        <DisplayEntry entry={entry} />
+        <DisplayEntry key={entry.id} entry={entry} />
       ))}
-      {entries.length < 1 && isEditing && <InputAdd x={x} y={y} />}
+      {entries.length < 1 && data?.isEditing && <InputAdd x={x} y={y} />}
     </div>
   );
 }
 
 function DisplayEntry({ entry }: { entry: Entry }) {
-  const isEditing = useBearStore((s) => s.isEditing);
-  const showComments = useBearStore((s) => s.showComments);
+  const { data } = idbapi.settings.get.useQuery();
 
-  if (isEditing) {
+  if (data?.isEditing) {
     return (
       <div className="flex p-2 relative">
         <div className="flex flex-col">
@@ -276,7 +293,7 @@ function DisplayEntry({ entry }: { entry: Entry }) {
             <InputUpdateLabel entry={entry} />
           </div>
 
-          {showComments && <InputUpdateComment entry={entry} />}
+          {data?.showComments && <InputUpdateComment entry={entry} />}
         </div>
         <ButtonRemove id={entry.id} className="absolute right-2 top-3.5" />
       </div>
