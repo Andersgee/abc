@@ -98,6 +98,8 @@ function TableConent() {
   const X = getX(entries ?? []);
   const Y = indexArray(14);
 
+  const { data: settings } = idbapi.settings.get.useQuery();
+
   if (entries === undefined) return null;
 
   return Y.map((y) => {
@@ -105,7 +107,11 @@ function TableConent() {
     return (
       <div
         key={y}
-        className={cn("flex items-center", isToday(rowDate) && "bg-blue-300")}
+        className={cn(
+          "flex items-center",
+          isToday(rowDate) && "bg-blue-300",
+          !settings?.isEditing && "h-10"
+        )}
       >
         <div>{dateformat(rowDate)}</div>
 
@@ -115,7 +121,7 @@ function TableConent() {
           );
 
           return (
-            <DisplayEntries
+            <DisplayCellEntries
               key={`${y}-${x}`}
               entries={cellEntries}
               x={x}
@@ -260,7 +266,7 @@ function InputUpdateComment({ entry }: { entry: Entry }) {
     </form>
   );
 }
-function DisplayEntries({
+function DisplayCellEntries({
   x,
   y,
   entries,
@@ -269,22 +275,22 @@ function DisplayEntries({
   y: Date;
   entries: Entry[];
 }) {
-  const { data } = idbapi.settings.get.useQuery();
+  const { data: settings } = idbapi.settings.get.useQuery();
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col items-center">
       {entries.map((entry) => (
         <DisplayEntry key={entry.id} entry={entry} />
       ))}
-      {entries.length < 1 && data?.isEditing && <InputAdd x={x} y={y} />}
+      {entries.length < 1 && settings?.isEditing && <InputAdd x={x} y={y} />}
     </div>
   );
 }
 
 function DisplayEntry({ entry }: { entry: Entry }) {
-  const { data } = idbapi.settings.get.useQuery();
+  const { data: settings } = idbapi.settings.get.useQuery();
 
-  if (data?.isEditing) {
+  if (settings?.isEditing) {
     return (
       <div className="flex p-2 relative">
         <div className="flex flex-col">
@@ -293,7 +299,7 @@ function DisplayEntry({ entry }: { entry: Entry }) {
             <InputUpdateLabel entry={entry} />
           </div>
 
-          {data?.showComments && <InputUpdateComment entry={entry} />}
+          {settings?.showComments && <InputUpdateComment entry={entry} />}
         </div>
         <ButtonRemove id={entry.id} className="absolute right-2 top-3.5" />
       </div>
@@ -314,7 +320,7 @@ function DisplayEntry({ entry }: { entry: Entry }) {
         {entry.label}
       </div>
 
-      <div>{entry.comment}</div>
+      {settings?.showComments && <div>{entry.comment}</div>}
     </div>
   );
 }
