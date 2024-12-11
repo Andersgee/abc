@@ -88,15 +88,15 @@ export function Table() {
 
 function TableConent() {
   const d = startOfDay(new Date());
-  const from = subDays(d, 14);
-  const to = addDays(d, 14);
+  const from = subDays(d, 21);
+  const to = addDays(d, 21);
   const { data: entries } = idbapi.entry.listBetweenDates.useQuery({
     from,
     to,
   });
   //const [X, Y] = getGridSize(entries ?? []);
   const X = getX(entries ?? []);
-  const Y = indexArray(29);
+  const Y = indexArray(43);
 
   const { data: settings } = idbapi.settings.get.useQuery();
 
